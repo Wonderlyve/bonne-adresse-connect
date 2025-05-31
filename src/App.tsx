@@ -14,6 +14,12 @@ import Messages from "./pages/Messages";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import OrderService from "./pages/OrderService";
+import ContactProvider from "./pages/ContactProvider";
+import PrintingServices from "./pages/PrintingServices";
+import DesignServices from "./pages/DesignServices";
+import ArchitectureServices from "./pages/ArchitectureServices";
+import DevelopmentServices from "./pages/DevelopmentServices";
 import Navbar from "./components/Navbar";
 import MobileNav from "./components/MobileNav";
 
@@ -37,6 +43,12 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/order-service" element={<OrderService />} />
+            <Route path="/contact-provider" element={<ContactProvider />} />
+            <Route path="/imprimeurs" element={<PrintingServices />} />
+            <Route path="/designers-services" element={<DesignServices />} />
+            <Route path="/architectes" element={<ArchitectureServices />} />
+            <Route path="/developpeurs" element={<DevelopmentServices />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <MobileNav />
