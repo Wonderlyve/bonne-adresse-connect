@@ -2,8 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, MessageCircle, ShoppingBag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const FeaturedProviders = () => {
+  const navigate = useNavigate();
+
   const providerCategories = [
     {
       title: "Imprimerie",
@@ -156,47 +159,55 @@ const FeaturedProviders = () => {
     }
   };
 
+  const handleContact = () => {
+    navigate('/contact-provider');
+  };
+
+  const handleOrder = () => {
+    navigate('/order-service');
+  };
+
   const ProviderCard = ({ provider }: { provider: any }) => (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 overflow-hidden group min-w-[280px] max-w-[280px]">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 overflow-hidden group min-w-[260px] max-w-[260px]">
       <div className="relative">
         <img
           src={provider.image}
           alt={provider.name}
-          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+          className="w-full h-36 object-cover group-hover:scale-110 transition-transform duration-300"
         />
-        <div className="absolute top-3 left-3">
-          <Badge variant={getBadgeVariant(provider.badge)} className="font-medium">
+        <div className="absolute top-2 left-2">
+          <Badge variant={getBadgeVariant(provider.badge)} className="font-medium text-xs">
             {provider.badge}
           </Badge>
         </div>
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-2 right-2">
           {provider.isOnline && (
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse-ring"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full absolute"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse-ring"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full absolute"></div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-3">
+      <div className="p-4">
+        <div className="flex items-start justify-between mb-2">
           <div>
-            <h3 className="font-bold text-lg text-gray-900 mb-1">{provider.name}</h3>
-            <p className="text-sm text-gray-600">{provider.category}</p>
+            <h3 className="font-bold text-base text-gray-900 mb-1">{provider.name}</h3>
+            <p className="text-xs text-gray-600">{provider.category}</p>
           </div>
           <div className="flex items-center space-x-1 text-yellow-500">
-            <Star className="h-4 w-4 fill-current" />
-            <span className="text-sm font-medium text-gray-700">{provider.rating}</span>
+            <Star className="h-3 w-3 fill-current" />
+            <span className="text-xs font-medium text-gray-700">{provider.rating}</span>
           </div>
         </div>
 
-        <div className="flex items-center text-gray-500 text-sm mb-3">
-          <MapPin className="h-4 w-4 mr-1" />
+        <div className="flex items-center text-gray-500 text-xs mb-2">
+          <MapPin className="h-3 w-3 mr-1" />
           <span>{provider.location}</span>
         </div>
 
-        <div className="flex flex-wrap gap-1 mb-4">
+        <div className="flex flex-wrap gap-1 mb-3">
           {provider.services.slice(0, 3).map((service: string) => (
             <span
               key={service}
@@ -207,25 +218,27 @@ const FeaturedProviders = () => {
           ))}
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <span className="font-semibold text-primary-600">{provider.price}</span>
-          <span className="text-sm text-gray-500">({provider.reviews} avis)</span>
+        <div className="flex items-center justify-between mb-3">
+          <span className="font-semibold text-primary-600 text-sm">{provider.price}</span>
+          <span className="text-xs text-gray-500">({provider.reviews} avis)</span>
         </div>
 
         <div className="flex space-x-2">
           <Button
             size="sm"
             variant="outline"
-            className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50"
+            className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50 text-xs"
+            onClick={handleContact}
           >
-            <MessageCircle className="h-4 w-4 mr-1" />
+            <MessageCircle className="h-3 w-3 mr-1" />
             Contacter
           </Button>
           <Button
             size="sm"
-            className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+            className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-xs"
+            onClick={handleOrder}
           >
-            <ShoppingBag className="h-4 w-4 mr-1" />
+            <ShoppingBag className="h-3 w-3 mr-1" />
             Commander
           </Button>
         </div>
@@ -234,13 +247,13 @@ const FeaturedProviders = () => {
   );
 
   return (
-    <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="space-y-8">
+    <section className="py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="space-y-4">
         {providerCategories.map((category) => (
           <div key={category.title}>
-            <h3 className="text-lg font-medium text-gray-700 mb-4">{category.title}</h3>
+            <h3 className="text-base font-medium text-gray-700 mb-3">{category.title}</h3>
             <div className="overflow-x-auto">
-              <div className="flex space-x-6 pb-4">
+              <div className="flex space-x-4 pb-4">
                 {category.providers.map((provider) => (
                   <ProviderCard key={provider.id} provider={provider} />
                 ))}
@@ -250,7 +263,7 @@ const FeaturedProviders = () => {
         ))}
       </div>
 
-      <div className="text-center mt-8">
+      <div className="text-center mt-6">
         <Button
           variant="outline"
           size="lg"
