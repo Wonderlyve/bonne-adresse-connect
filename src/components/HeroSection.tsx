@@ -6,8 +6,8 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background with gradient */}
-      <div className="absolute inset-0 bg-hero-gradient opacity-10"></div>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" fill-rule=\"evenodd\"><g fill=\"%239C92AC\" fill-opacity=\"0.05\"><circle cx=\"30\" cy=\"30\" r=\"4\"/></g></g></svg>')] animate-pulse"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-60"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_rgba(156,146,172,0.1)_1px,_transparent_0)] bg-[length:30px_30px] animate-pulse"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fade-in">
         <div className="space-y-8">
