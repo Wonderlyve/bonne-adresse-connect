@@ -6,18 +6,13 @@ const SearchSection = () => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-primary-600 via-secondary-600 to-accent-600 bg-clip-text text-transparent">
-            Que cherchez-vous ?
-          </span>
+        <h1 className="text-2xl font-semibold mb-6 text-gray-700">
+          Que cherchez-vous ?
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Trouvez le prestataire qu'il vous faut près de chez vous
-        </p>
       </div>
 
       {/* Search Bar */}
-      <div className="max-w-2xl mx-auto mb-8">
+      <div className="max-w-2xl mx-auto">
         <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white rounded-2xl shadow-xl border border-gray-200/50">
           <div className="flex-1">
             <div className="relative">
@@ -40,19 +35,6 @@ const SearchSection = () => {
             Rechercher
           </Button>
         </div>
-      </div>
-
-      {/* Popular Categories */}
-      <div className="flex flex-wrap justify-center gap-3">
-        {["Impression", "Design", "Architecture", "Signalétique", "Textile", "Digital"].map((category) => (
-          <Button
-            key={category}
-            variant="outline"
-            className="rounded-full border-primary-200 text-primary-600 hover:bg-primary-50 hover:border-primary-300 transition-all duration-200 hover:scale-105"
-          >
-            {category}
-          </Button>
-        ))}
       </div>
     </section>
   );

@@ -1,8 +1,12 @@
-
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Users, Shield, Clock, Award, Globe } from "lucide-react";
 
 const About = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const features = [
     {
       icon: Shield,
@@ -33,6 +37,39 @@ const About = () => {
     { number: "24/7", label: "Support client", color: "text-green-600" }
   ];
 
+  const services = [
+    {
+      title: "Impression",
+      description: "Flyers, cartes de visite, affiches, banderoles",
+      icon: "🖨️"
+    },
+    {
+      title: "Design",
+      description: "Logo, identité visuelle, design graphique",
+      icon: "🎨"
+    },
+    {
+      title: "Architecture",
+      description: "Plans, modélisation 3D, permis de construire",
+      icon: "🏗️"
+    },
+    {
+      title: "Signalétique",
+      description: "Enseignes, panneaux, signalisation",
+      icon: "🪧"
+    },
+    {
+      title: "Textile",
+      description: "T-shirts, uniformes, broderie",
+      icon: "👕"
+    },
+    {
+      title: "Digital",
+      description: "Sites web, applications, marketing digital",
+      icon: "💻"
+    }
+  ];
+
   return (
     <div className="min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,6 +81,32 @@ const About = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             La plateforme de référence qui connecte vos besoins aux meilleurs professionnels locaux dans l'impression, le design et l'architecture.
           </p>
+        </div>
+
+        {/* Services Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            Nos services
+          </h2>
+          <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+            Une large gamme de services pour tous vos besoins professionnels
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <div
+                key={index}
+                className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100"
+              >
+                <div className="text-4xl mb-4">{service.icon}</div>
+                <h3 className="font-bold text-lg text-gray-900 mb-3">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {service.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Mission */}
