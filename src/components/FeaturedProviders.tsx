@@ -11,7 +11,7 @@ const FeaturedProviders = () => {
       category: "Imprimerie",
       rating: 4.8,
       location: "Kinshasa, Gombe",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop",
       services: ["Flyers", "Cartes de visite", "Banderoles"],
       price: "À partir de 50$",
       badge: "Boosté",
@@ -24,7 +24,7 @@ const FeaturedProviders = () => {
       category: "Design Graphique",
       rating: 4.9,
       location: "Kinshasa, Lingwala",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
       services: ["Logo", "Branding", "Site web"],
       price: "À partir de 100$",
       badge: "Populaire",
@@ -37,7 +37,7 @@ const FeaturedProviders = () => {
       category: "Architecture",
       rating: 4.7,
       location: "Kinshasa, Ngaliema",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
       services: ["Plans", "3D", "Permis"],
       price: "À partir de 500$",
       badge: "Nouveau",
@@ -50,7 +50,7 @@ const FeaturedProviders = () => {
       category: "Signalétique",
       rating: 4.6,
       location: "Kinshasa, Kintambo",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop",
       services: ["Enseignes", "Totems", "Panneaux"],
       price: "À partir de 200$",
       badge: "Boosté",
@@ -75,7 +75,7 @@ const FeaturedProviders = () => {
           Prestataires en vedette
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Découvrez nos partenaires de confiance, sélectionnés pour leur expertise et leur qualité de service
+          Découvrez nos partenaires de confiance
         </p>
       </div>
 

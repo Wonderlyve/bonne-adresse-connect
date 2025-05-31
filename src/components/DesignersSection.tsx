@@ -9,7 +9,7 @@ const DesignersSection = () => {
       id: 1,
       name: "Marie Nkomo",
       title: "Designer UI/UX Expert",
-      avatar: "/placeholder.svg",
+      avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face",
       rating: 4.9,
       reviews: 127,
       completedProjects: 89,
@@ -18,13 +18,17 @@ const DesignersSection = () => {
       specialties: ["Logo", "Branding", "UI/UX"],
       isOnline: true,
       verified: true,
-      portfolio: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"]
+      portfolio: [
+        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200&h=150&fit=crop"
+      ]
     },
     {
       id: 2,
       name: "Jean-Paul Mbuyi",
       title: "Architecte & Designer 3D",
-      avatar: "/placeholder.svg",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
       rating: 4.8,
       reviews: 94,
       completedProjects: 156,
@@ -33,13 +37,17 @@ const DesignersSection = () => {
       specialties: ["Architecture", "3D", "Plans"],
       isOnline: false,
       verified: true,
-      portfolio: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"]
+      portfolio: [
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=200&h=150&fit=crop"
+      ]
     },
     {
       id: 3,
       name: "Grace Kasongo",
       title: "Graphiste Print & Digital",
-      avatar: "/placeholder.svg",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
       rating: 4.7,
       reviews: 73,
       completedProjects: 112,
@@ -48,7 +56,11 @@ const DesignersSection = () => {
       specialties: ["Print", "Digital", "Illustration"],
       isOnline: true,
       verified: true,
-      portfolio: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"]
+      portfolio: [
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&h=150&fit=crop"
+      ]
     }
   ];
 
@@ -59,7 +71,7 @@ const DesignersSection = () => {
           Trouvez votre designer
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-          Des talents créatifs pour donner vie à vos projets, du logo à l'architecture
+          Des talents créatifs pour donner vie à vos projets
         </p>
         <Button className="bg-gradient-to-r from-secondary-600 to-accent-600 hover:from-secondary-700 hover:to-accent-700">
           Voir tous les designers

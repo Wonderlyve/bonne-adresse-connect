@@ -10,6 +10,9 @@ import Providers from "./pages/Providers";
 import Designers from "./pages/Designers";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
+import Messages from "./pages/Messages";
+import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import MobileNav from "./components/MobileNav";
@@ -31,6 +34,9 @@ const App = () => (
             <Route path="/designers" element={<Designers />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <MobileNav />
