@@ -21,6 +21,9 @@ import PrintingServices from "./pages/PrintingServices";
 import DesignServices from "./pages/DesignServices";
 import ArchitectureServices from "./pages/ArchitectureServices";
 import DevelopmentServices from "./pages/DevelopmentServices";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ProviderDashboard from "./pages/ProviderDashboard";
 import Navbar from "./components/Navbar";
 import MobileNav from "./components/MobileNav";
 
@@ -51,6 +54,9 @@ const App = () => (
             <Route path="/designers-services" element={<DesignServices />} />
             <Route path="/architectes" element={<ArchitectureServices />} />
             <Route path="/developpeurs" element={<DevelopmentServices />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/provider-dashboard" element={<ProviderDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <MobileNav />
