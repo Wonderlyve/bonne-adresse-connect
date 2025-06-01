@@ -1,12 +1,16 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search, User, MessageCircle, ShoppingBag } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Menu, X, Search, User, MessageCircle, ShoppingBag, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const navigation = [
     { name: "Accueil", href: "/", current: location.pathname === "/" },
@@ -15,6 +19,11 @@ const Navbar = () => {
     { name: "Services", href: "/services", current: location.pathname === "/services" },
     { name: "À propos", href: "/about", current: location.pathname === "/about" },
   ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
@@ -59,12 +68,28 @@ const Navbar = () => {
             <Button variant="ghost" size="sm" className="hover:bg-gray-100">
               <ShoppingBag className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" className="border-primary-200 text-primary-600 hover:bg-primary-50">
-              Connexion
-            </Button>
-            <Button size="sm" className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
-              S'inscrire
-            </Button>
+            
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-gray-100">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" className="border-primary-200 text-primary-600 hover:bg-primary-50" asChild>
+                  <Link to="/login">Connexion</Link>
+                </Button>
+                <Button size="sm" className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700" asChild>
+                  <Link to="/register">S'inscrire</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -100,12 +125,29 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-gray-200 space-y-2">
-              <Button variant="outline" className="w-full border-primary-200 text-primary-600">
-                Connexion
-              </Button>
-              <Button className="w-full bg-gradient-to-r from-primary-600 to-secondary-600">
-                S'inscrire
-              </Button>
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 px-3 py-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.avatar} alt={user?.name} />
+                      <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                  </div>
+                  <Button variant="outline" className="w-full" onClick={handleLogout}>
+                    Déconnexion
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="outline" className="w-full border-primary-200 text-primary-600" asChild>
+                    <Link to="/login">Connexion</Link>
+                  </Button>
+                  <Button className="w-full bg-gradient-to-r from-primary-600 to-secondary-600" asChild>
+                    <Link to="/register">S'inscrire</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
