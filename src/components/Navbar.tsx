@@ -1,16 +1,12 @@
 
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, X, Search, User, MessageCircle, ShoppingBag, LogOut } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Menu, X, Search, User, MessageCircle, ShoppingBag } from "lucide-react";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
 
   const navigation = [
     { name: "Accueil", href: "/", current: location.pathname === "/" },
@@ -19,15 +15,6 @@ const Navbar = () => {
     { name: "Services", href: "/services", current: location.pathname === "/services" },
     { name: "À propos", href: "/about", current: location.pathname === "/about" },
   ];
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const getUserInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
 
   return (
     <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
@@ -66,41 +53,18 @@ const Navbar = () => {
             <Button variant="ghost" size="sm" className="hover:bg-gray-100">
               <Search className="h-4 w-4" />
             </Button>
-            {isAuthenticated && (
-              <>
-                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-                  <ShoppingBag className="h-4 w-4" />
-                </Button>
-                <div className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt={user?.name} />
-                    <AvatarFallback className="bg-primary-100 text-primary-600 text-sm">
-                      {user?.name ? getUserInitials(user.name) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-gray-100">
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </div>
-              </>
-            )}
-            {!isAuthenticated && (
-              <>
-                <Link to="/login">
-                  <Button variant="outline" size="sm" className="border-primary-200 text-primary-600 hover:bg-primary-50">
-                    Connexion
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm" className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
-                    S'inscrire
-                  </Button>
-                </Link>
-              </>
-            )}
+            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+              <ShoppingBag className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" className="border-primary-200 text-primary-600 hover:bg-primary-50">
+              Connexion
+            </Button>
+            <Button size="sm" className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
+              S'inscrire
+            </Button>
           </div>
 
           {/* Mobile menu button */}
@@ -136,24 +100,12 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-gray-200 space-y-2">
-              {!isAuthenticated ? (
-                <>
-                  <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-primary-200 text-primary-600">
-                      Connexion
-                    </Button>
-                  </Link>
-                  <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-primary-600 to-secondary-600">
-                      S'inscrire
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <Button onClick={handleLogout} variant="outline" className="w-full">
-                  Se déconnecter
-                </Button>
-              )}
+              <Button variant="outline" className="w-full border-primary-200 text-primary-600">
+                Connexion
+              </Button>
+              <Button className="w-full bg-gradient-to-r from-primary-600 to-secondary-600">
+                S'inscrire
+              </Button>
             </div>
           </div>
         </div>
