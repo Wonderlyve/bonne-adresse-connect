@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, MessageCircle, ShoppingBag, ExternalLink } from "lucide-react";
@@ -408,15 +409,23 @@ const FeaturedProviders = () => {
     navigate('/order-service');
   };
 
+  const handleProviderClick = (providerId: string | number) => {
+    if (typeof providerId === 'string' && providerId.startsWith('ad')) {
+      // Handle ad click
+      return;
+    }
+    navigate(`/provider/${providerId}`);
+  };
+
   const ProviderCard = ({ provider }: { provider: any }) => {
     if (provider.isAd) {
       return (
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-dashed border-blue-200 overflow-hidden group min-w-[240px] max-w-[240px]">
-          <div className="relative">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-dashed border-blue-200 overflow-hidden group min-w-[240px] max-w-[240px] h-[280px] flex flex-col">
+          <div className="relative flex-1">
             <img
               src={provider.image}
               alt="Publicité"
-              className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             />
             <div className="absolute top-2 left-2">
               <Badge variant="outline" className="font-medium text-xs bg-white/90">
@@ -425,13 +434,13 @@ const FeaturedProviders = () => {
             </div>
           </div>
 
-          <div className="p-3">
+          <div className="p-3 flex-shrink-0">
             <div className="text-center">
               <h3 className="font-bold text-sm text-gray-800 mb-1">Votre publicité ici</h3>
               <p className="text-xs text-gray-600 mb-2">Atteignez plus de clients</p>
               <Button
                 size="sm"
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-xs"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-xs h-7"
               >
                 <ExternalLink className="h-3 w-3 mr-1" />
                 En savoir plus
@@ -443,12 +452,15 @@ const FeaturedProviders = () => {
     }
 
     return (
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 overflow-hidden group min-w-[240px] max-w-[240px]">
+      <div 
+        className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 overflow-hidden group min-w-[240px] max-w-[240px] h-[280px] flex flex-col cursor-pointer"
+        onClick={() => handleProviderClick(provider.id)}
+      >
         <div className="relative">
           <img
             src={provider.image}
             alt={provider.name}
-            className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
+            className="w-full h-28 object-cover group-hover:scale-110 transition-transform duration-300"
           />
           <div className="absolute top-2 left-2">
             <Badge variant={getBadgeVariant(provider.badge)} className="font-medium text-xs">
@@ -465,53 +477,59 @@ const FeaturedProviders = () => {
           </div>
         </div>
 
-        <div className="p-3">
+        <div className="p-3 flex flex-col flex-1">
           <div className="flex items-start justify-between mb-2">
-            <div>
-              <h3 className="font-bold text-sm text-gray-900 mb-1">{provider.name}</h3>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-sm text-gray-900 mb-1 truncate">{provider.name}</h3>
               <p className="text-xs text-gray-600">{provider.category}</p>
             </div>
-            <div className="flex items-center space-x-1 text-yellow-500">
+            <div className="flex items-center space-x-1 text-yellow-500 ml-2">
               <Star className="h-3 w-3 fill-current" />
               <span className="text-xs font-medium text-gray-700">{provider.rating}</span>
             </div>
           </div>
 
           <div className="flex items-center text-gray-500 text-xs mb-2">
-            <MapPin className="h-3 w-3 mr-1" />
-            <span>{provider.location}</span>
+            <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+            <span className="truncate">{provider.location}</span>
           </div>
 
-          <div className="flex flex-wrap gap-1 mb-2">
+          <div className="flex flex-wrap gap-1 mb-2 flex-1">
             {provider.services.slice(0, 3).map((service: string) => (
               <span
                 key={service}
-                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full truncate"
               >
                 {service}
               </span>
             ))}
           </div>
 
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <span className="font-semibold text-primary-600 text-xs">{provider.price}</span>
             <span className="text-xs text-gray-500">({provider.reviews} avis)</span>
           </div>
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 mt-auto">
             <Button
               size="sm"
               variant="outline"
-              className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50 text-xs h-8"
-              onClick={handleContact}
+              className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50 text-xs h-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleContact();
+              }}
             >
               <MessageCircle className="h-3 w-3 mr-1" />
               Contacter
             </Button>
             <Button
               size="sm"
-              className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-xs h-8"
-              onClick={handleOrder}
+              className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-xs h-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOrder();
+              }}
             >
               <ShoppingBag className="h-3 w-3 mr-1" />
               Commander
