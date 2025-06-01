@@ -7,11 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, User, Mail, Lock, Building } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -31,13 +29,11 @@ const Register = () => {
     }
     
     // Mock registration - in real app, this would call an API
-    const userData = {
+    localStorage.setItem('user', JSON.stringify({
       name: formData.fullName,
       email: formData.email,
-      userType: formData.userType as 'client' | 'provider'
-    };
-    
-    login(userData);
+      userType: formData.userType
+    }));
     
     if (formData.userType === 'provider') {
       navigate('/provider-dashboard');

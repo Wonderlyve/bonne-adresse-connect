@@ -1,22 +1,16 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, MessageCircle, ShoppingBag, User, LogIn } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Home, Search, MessageCircle, ShoppingBag, User } from "lucide-react";
 
 const MobileNav = () => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
 
   const navigation = [
     { name: "Accueil", href: "/", icon: Home },
     { name: "Recherche", href: "/providers", icon: Search },
     { name: "Messages", href: "/messages", icon: MessageCircle },
     { name: "Commandes", href: "/orders", icon: ShoppingBag },
-    { 
-      name: isAuthenticated ? "Profil" : "Se connecter", 
-      href: isAuthenticated ? "/profile" : "/login", 
-      icon: isAuthenticated ? User : LogIn 
-    },
+    { name: "Profil", href: "/profile", icon: User },
   ];
 
   return (
