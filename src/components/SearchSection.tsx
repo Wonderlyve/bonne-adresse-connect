@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 const SearchSection = () => {
   return (
-    <section className="py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section className="py-2 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Search Bar */}
       <div className="max-w-2xl mx-auto">
         <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200/50">
