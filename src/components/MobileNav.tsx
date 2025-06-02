@@ -1,19 +1,23 @@
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Search, MessageCircle, ShoppingBag, User, LogIn } from "lucide-react";
+import { Home, MessageCircle, ShoppingBag, User, LogIn, LayoutDashboard } from "lucide-react";
 import { useAuthContext } from "@/contexts/AuthContext";
 
 const MobileNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, user } = useAuthContext();
 
   const navigation = [
     { name: "Accueil", href: "/", icon: Home },
-    { name: "Recherche", href: "/providers", icon: Search },
     { name: "Messages", href: "/messages", icon: MessageCircle },
     { name: "Commandes", href: "/orders", icon: ShoppingBag },
   ];
+
+  // Add dashboard for providers
+  if (isAuthenticated && user?.userType === 'provider') {
+    navigation.push({ name: "Tableau de bord", href: "/provider-dashboard", icon: LayoutDashboard });
+  }
 
   const handleProfileClick = () => {
     if (isAuthenticated) {

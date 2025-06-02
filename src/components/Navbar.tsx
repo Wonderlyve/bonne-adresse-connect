@@ -3,11 +3,13 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, X, Search, MessageCircle, ShoppingBag, LogOut } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Menu, X, Search, MessageCircle, ShoppingBag, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthContext } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthContext();
@@ -23,6 +25,13 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/providers?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -59,9 +68,20 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-              <Search className="h-4 w-4" />
-            </Button>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex items-center">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 pl-10 pr-4 py-2 text-sm"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </form>
+
             <Button variant="ghost" size="sm" className="hover:bg-gray-100">
               <MessageCircle className="h-4 w-4" />
             </Button>
@@ -71,6 +91,16 @@ const Navbar = () => {
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
+                {user?.userType === 'provider' && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate('/provider-dashboard')}
+                    className="hover:bg-gray-100"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                  </Button>
+                )}
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="" />
                   <AvatarFallback className="bg-primary-100 text-primary-700">
@@ -121,6 +151,20 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 animate-slide-in">
           <div className="px-4 pt-2 pb-3 space-y-1">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="mb-4">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </form>
+
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -147,6 +191,19 @@ const Navbar = () => {
                     </Avatar>
                     <span className="font-medium text-gray-700">{user?.name}</span>
                   </div>
+                  {user?.userType === 'provider' && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        navigate('/provider-dashboard');
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Tableau de bord
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Déconnexion
