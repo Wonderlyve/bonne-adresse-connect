@@ -1,10 +1,12 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, MoreVertical, Phone, Video, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Messages = () => {
   const [selectedChat, setSelectedChat] = useState(1);
+  const navigate = useNavigate();
 
   const conversations = [
     {
@@ -39,6 +41,10 @@ const Messages = () => {
     { id: 3, sender: "them", message: "Votre commande est prête pour le retrait", time: "10:30" }
   ];
 
+  const handleConversationClick = (convId: number) => {
+    navigate(`/chat/${convId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-7xl mx-auto h-[calc(100vh-4rem)]">
@@ -59,7 +65,7 @@ const Messages = () => {
               {conversations.map((conv) => (
                 <div
                   key={conv.id}
-                  onClick={() => setSelectedChat(conv.id)}
+                  onClick={() => handleConversationClick(conv.id)}
                   className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
                     selectedChat === conv.id ? "bg-primary-50 border-l-4 border-l-primary-500" : ""
                   }`}
@@ -88,8 +94,8 @@ const Messages = () => {
             </div>
           </div>
 
-          {/* Chat Area */}
-          <div className="lg:col-span-2 flex flex-col">
+          {/* Chat Area - Desktop only preview */}
+          <div className="lg:col-span-2 hidden lg:flex flex-col">
             {/* Chat Header */}
             <div className="p-4 border-b border-gray-200 bg-white">
               <div className="flex items-center justify-between">
@@ -141,6 +147,11 @@ const Messages = () => {
                   </div>
                 ))}
               </div>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg text-center">
+                <p className="text-sm text-blue-600">
+                  Cliquez sur une conversation pour ouvrir le chat complet
+                </p>
+              </div>
             </div>
 
             {/* Message Input */}
@@ -150,8 +161,9 @@ const Messages = () => {
                   type="text"
                   placeholder="Tapez votre message..."
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  disabled
                 />
-                <Button className="px-4 py-2">
+                <Button className="px-4 py-2" disabled>
                   <Send className="h-4 w-4" />
                 </Button>
               </div>

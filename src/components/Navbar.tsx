@@ -3,12 +3,14 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Menu, X, Search, MessageCircle, ShoppingBag, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthContext } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,6 +33,8 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/providers?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
     }
   };
 
@@ -68,19 +72,31 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="flex items-center">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Rechercher..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64 pl-10 pr-4 py-2 text-sm"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
-            </form>
+            {/* Search Icon */}
+            <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Rechercher</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSearch} className="space-y-4">
+                  <Input
+                    type="text"
+                    placeholder="Que recherchez-vous ?"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                  <Button type="submit" className="w-full">
+                    Rechercher
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
 
             <Button variant="ghost" size="sm" className="hover:bg-gray-100">
               <MessageCircle className="h-4 w-4" />
