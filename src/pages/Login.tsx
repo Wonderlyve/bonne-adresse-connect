@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -22,10 +24,10 @@ const Login = () => {
     const mockUser = {
       name: "Utilisateur Test",
       email: formData.email,
-      userType: formData.email.includes('provider') ? 'provider' : 'client'
+      userType: formData.email.includes('provider') ? 'provider' as const : 'client' as const
     };
     
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    login(mockUser);
     
     if (mockUser.userType === 'provider') {
       navigate('/provider-dashboard');

@@ -1,11 +1,11 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock, Shield, MessageCircle, Phone } from "lucide-react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-const OrderService = () => {
+const OrderServiceContent = () => {
   const [selectedService, setSelectedService] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -206,6 +206,14 @@ const OrderService = () => {
       </div>
       <div className="h-20 md:h-0"></div>
     </div>
+  );
+};
+
+const OrderService = () => {
+  return (
+    <ProtectedRoute>
+      <OrderServiceContent />
+    </ProtectedRoute>
   );
 };
 

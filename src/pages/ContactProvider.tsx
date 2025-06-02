@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock, Shield, MessageCircle, Phone, Mail } from "lucide-react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-const ContactProvider = () => {
+const ContactProviderContent = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -204,6 +205,14 @@ const ContactProvider = () => {
       </div>
       <div className="h-20 md:h-0"></div>
     </div>
+  );
+};
+
+const ContactProvider = () => {
+  return (
+    <ProtectedRoute>
+      <ContactProviderContent />
+    </ProtectedRoute>
   );
 };
 
