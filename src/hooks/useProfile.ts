@@ -59,7 +59,20 @@ export const useProfile = () => {
         throw error;
       }
 
-      setProfile(data);
+      // Type assertion pour s'assurer que les types correspondent
+      const profileData: Profile = {
+        id: data.id,
+        email: data.email,
+        full_name: data.full_name,
+        phone: data.phone,
+        user_type: data.user_type as 'client' | 'provider',
+        status: data.status as 'active' | 'suspended',
+        violation_count: data.violation_count,
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
+
+      setProfile(profileData);
     } catch (error) {
       console.error('Erreur lors de la récupération du profil:', error);
     } finally {

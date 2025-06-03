@@ -6,33 +6,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Mock login - in real app, this would call an API
-    const mockUser = {
-      name: "Utilisateur Test",
-      email: formData.email,
-      userType: formData.email.includes('provider') ? 'provider' as const : 'client' as const
-    };
-    
-    login(mockUser);
-    
-    if (mockUser.userType === 'provider') {
-      navigate('/provider-dashboard');
-    } else {
-      navigate('/');
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Email ou mot de passe incorrect');
+        } else {
+          toast.error('Erreur de connexion: ' + error.message);
+        }
+        return;
+      }
+
+      if (data.user) {
+        toast.success('Connexion réussie!');
+        // Redirection automatique via useProfile
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      toast.error('Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,6 +77,7 @@ const Login = () => {
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -79,6 +94,7 @@ const Login = () => {
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   className="pl-10 pr-10"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -90,14 +106,12 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
-                Mot de passe oublié ?
-              </Link>
-            </div>
-
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
-              Se connecter
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
 
@@ -106,13 +120,6 @@ const Login = () => {
             <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
               S'inscrire
             </Link>
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-xs text-gray-500">
-              Test: utilisez n'importe quel email et mot de passe<br />
-              (ajoutez "provider" dans l'email pour tester le compte prestataire)
-            </p>
           </div>
         </CardContent>
       </Card>

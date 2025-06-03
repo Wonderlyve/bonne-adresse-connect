@@ -7,12 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, User, Mail, Lock, Building } from "lucide-react";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -22,27 +23,52 @@ const Register = () => {
     company: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple validation for demo
+    
     if (formData.password !== formData.confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
+      toast.error("Les mots de passe ne correspondent pas");
       return;
     }
+
+    if (formData.password.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
+    setIsLoading(true);
     
-    // Mock registration - in real app, this would call an API
-    const userData = {
-      name: formData.fullName,
-      email: formData.email,
-      userType: formData.userType as 'client' | 'provider'
-    };
-    
-    login(userData);
-    
-    if (formData.userType === 'provider') {
-      navigate('/provider-dashboard');
-    } else {
-      navigate('/');
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            user_type: formData.userType
+          },
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        if (error.message.includes('already registered')) {
+          toast.error('Un compte existe déjà avec cet email');
+        } else {
+          toast.error('Erreur lors de l\'inscription: ' + error.message);
+        }
+        return;
+      }
+
+      if (data.user) {
+        toast.success('Inscription réussie! Vérifiez votre email pour confirmer votre compte.');
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Erreur d\'inscription:', error);
+      toast.error('Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,6 +99,7 @@ const Register = () => {
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -89,6 +116,7 @@ const Register = () => {
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -118,6 +146,7 @@ const Register = () => {
                     value={formData.company}
                     onChange={(e) => handleInputChange('company', e.target.value)}
                     className="pl-10"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -135,6 +164,7 @@ const Register = () => {
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   className="pl-10 pr-10"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -158,12 +188,17 @@ const Register = () => {
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700">
-              Créer mon compte
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Création...' : 'Créer mon compte'}
             </Button>
           </form>
 

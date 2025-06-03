@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { Flag, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useProfile } from '@/hooks/useProfile';
+import { toast } from 'sonner';
 
 interface ReportUserProps {
   reportedUserId: string;
@@ -17,47 +18,35 @@ interface ReportUserProps {
 
 const ReportUser: React.FC<ReportUserProps> = ({ 
   reportedUserId, 
-  reportedUserName,
+  reportedUserName, 
   size = 'default' 
 }) => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useProfile();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user || !reason.trim()) {
-      toast.error('Veuillez remplir la raison du signalement');
-      return;
-    }
-
-    if (user.id === reportedUserId) {
-      toast.error('Vous ne pouvez pas vous signaler vous-même');
-      return;
-    }
+  const handleSubmit = async () => {
+    if (!user || !reason) return;
 
     setIsSubmitting(true);
-
     try {
-      const { error } = await supabase.from('reports').insert({
+      const finalReason = reason === 'autre' ? customReason : reason;
+      
+      await supabase.from('reports').insert({
         reported_user_id: reportedUserId,
         reporter_id: user.id,
-        reason: reason.trim()
-      });
-
-      if (error) throw error;
-
-      // Vérifier et suspendre l'utilisateur si nécessaire
-      await supabase.rpc('check_and_suspend_user', { user_uuid: reportedUserId });
+        reason: finalReason
+      } as any);
 
       toast.success('Signalement envoyé avec succès');
-      setOpen(false);
+      setIsOpen(false);
       setReason('');
+      setCustomReason('');
     } catch (error) {
-      console.error('Erreur lors du signalement:', error);
-      toast.error('Erreur lors de l\'envoi du signalement');
+      console.error('Erreur signalement:', error);
+      toast.error('Erreur lors du signalement');
     } finally {
       setIsSubmitting(false);
     }
@@ -66,54 +55,61 @@ const ReportUser: React.FC<ReportUserProps> = ({
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size={size}
           className="text-red-600 hover:text-red-700 hover:bg-red-50"
         >
-          <Flag className={`${size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'} mr-1`} />
-          Signaler
+          <AlertTriangle className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
-            <span>Signaler {reportedUserName}</span>
-          </DialogTitle>
+          <DialogTitle>Signaler {reportedUserName}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="reason">Raison du signalement</Label>
-            <Textarea
-              id="reason"
-              placeholder="Décrivez la raison de votre signalement (violation des règles, comportement inapproprié, etc.)"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={4}
-              required
-            />
+            <Label>Motif du signalement</Label>
+            <Select value={reason} onValueChange={setReason}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir un motif" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="spam">Spam</SelectItem>
+                <SelectItem value="harassment">Harcèlement</SelectItem>
+                <SelectItem value="inappropriate">Contenu inapproprié</SelectItem>
+                <SelectItem value="scam">Arnaque</SelectItem>
+                <SelectItem value="autre">Autre</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-            <p className="text-sm text-yellow-800">
-              <strong>Important :</strong> Les faux signalements peuvent entraîner des sanctions sur votre compte.
-            </p>
-          </div>
+
+          {reason === 'autre' && (
+            <div>
+              <Label>Précisez le motif</Label>
+              <Textarea
+                value={customReason}
+                onChange={(e) => setCustomReason(e.target.value)}
+                placeholder="Décrivez le problème..."
+                rows={3}
+              />
+            </div>
+          )}
+
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => setIsOpen(false)}>
               Annuler
             </Button>
             <Button 
-              type="submit" 
-              disabled={isSubmitting || !reason.trim()}
-              className="bg-red-600 hover:bg-red-700"
+              onClick={handleSubmit}
+              disabled={!reason || isSubmitting || (reason === 'autre' && !customReason)}
             >
-              {isSubmitting ? 'Envoi...' : 'Envoyer le signalement'}
+              {isSubmitting ? 'Envoi...' : 'Signaler'}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

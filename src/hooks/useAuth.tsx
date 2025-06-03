@@ -10,7 +10,7 @@ export interface User {
 export const useAuth = () => {
   const { profile, user, loading, signOut } = useProfile();
 
-  const login = (userData: User) => {
+  const login = () => {
     // Cette fonction est maintenant gérée par Supabase Auth
     console.log('Login via Supabase Auth');
   };

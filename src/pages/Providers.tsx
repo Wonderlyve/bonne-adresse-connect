@@ -7,9 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star, MapPin, MessageCircle, ShoppingBag, Search, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/hooks/useProfile";
+import { toast } from "sonner";
 
 const Providers = () => {
   const navigate = useNavigate();
+  const { user } = useProfile();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
@@ -178,11 +182,57 @@ const Providers = () => {
     }
   };
 
-  const handleContact = () => {
-    navigate('/contact-provider');
+  const handleMessage = async (providerId: number) => {
+    if (!user) {
+      toast.error('Veuillez vous connecter pour envoyer un message');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Créer ou trouver une conversation existante
+      const { data: existingConv, error: searchError } = await supabase
+        .from('conversations')
+        .select('id')
+        .or(`and(participant1_id.eq.${user.id},participant2_id.eq.provider_${providerId}),and(participant1_id.eq.provider_${providerId},participant2_id.eq.${user.id})`)
+        .single();
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        throw searchError;
+      }
+
+      let conversationId;
+
+      if (existingConv) {
+        conversationId = existingConv.id;
+      } else {
+        // Créer une nouvelle conversation
+        const { data: newConv, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            participant1_id: user.id,
+            participant2_id: `provider_${providerId}` // ID fictif pour le demo
+          })
+          .select('id')
+          .single();
+
+        if (createError) throw createError;
+        conversationId = newConv.id;
+      }
+
+      navigate(`/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Erreur création conversation:', error);
+      toast.error('Erreur lors de la création de la conversation');
+    }
   };
 
   const handleOrder = () => {
+    if (!user) {
+      toast.error('Veuillez vous connecter pour commander');
+      navigate('/login');
+      return;
+    }
     navigate('/order-service');
   };
 
@@ -320,11 +370,11 @@ const Providers = () => {
                     className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleContact();
+                      handleMessage(provider.id);
                     }}
                   >
                     <MessageCircle className="h-4 w-4 mr-1" />
-                    Contacter
+                    Message
                   </Button>
                   <Button
                     size="sm"

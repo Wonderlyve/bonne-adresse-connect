@@ -1,230 +1,319 @@
 
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, MapPin, MessageCircle, ShoppingBag, Phone, Mail, ExternalLink, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Star, MapPin, Users, CheckCircle, MessageCircle, ShoppingBag, Calendar, Award, Clock, Shield } from "lucide-react";
+import { useState } from "react";
 
 const ProviderProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Mock data - in a real app, this would come from an API
+  // Mock data - in real app would fetch from API
   const provider = {
-    id: 1,
+    id: parseInt(id || "1"),
     name: "Print Express",
     category: "Imprimerie",
     rating: 4.8,
     location: "Kinshasa, Gombe",
-    coverImage: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop",
-    profileImage: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=150&h=150&fit=crop",
-    badge: "Boosté",
-    reviews: 156,
-    description: "Nous sommes une imprimerie moderne spécialisée dans l'impression de haute qualité. Avec plus de 10 ans d'expérience, nous offrons des services rapides et professionnels pour tous vos besoins d'impression.",
-    phone: "+243 123 456 789",
-    email: "contact@printexpress.cd",
-    website: "www.printexpress.cd",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=600&fit=crop",
+    coverImage: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=1200&h=400&fit=crop",
+    isOnline: true,
+    isVerified: true,
+    responseTime: "< 1h",
+    completedProjects: 156,
+    clientSatisfaction: 98,
+    memberSince: "2022",
+    description: "Print Express est votre partenaire de confiance pour tous vos besoins d'impression professionnelle. Avec plus de 5 ans d'expérience dans le domaine, nous offrons des services de qualité supérieure avec des délais respectés.",
     services: [
-      { name: "Impression de flyers", price: "À partir de 50$", description: "Flyers couleur haute qualité" },
-      { name: "Cartes de visite", price: "À partir de 30$", description: "Cartes professionnelles" },
-      { name: "Banderoles", price: "À partir de 100$", description: "Banderoles publicitaires" },
-      { name: "Brochures", price: "À partir de 80$", description: "Brochures pliées" },
-      { name: "Affiches", price: "À partir de 60$", description: "Affiches grand format" },
-      { name: "Calendriers", price: "À partir de 120$", description: "Calendriers personnalisés" }
+      { name: "Impression de flyers", price: "À partir de 50$", duration: "24-48h" },
+      { name: "Cartes de visite", price: "À partir de 30$", duration: "24h" },
+      { name: "Banderoles publicitaires", price: "À partir de 100$", duration: "3-5 jours" },
+      { name: "Brochures", price: "À partir de 80$", duration: "2-3 jours" },
+      { name: "Affiches grand format", price: "À partir de 120$", duration: "3-4 jours" }
     ],
-    portfolio: [
-      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop"
+    gallery: [
+      "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop"
     ],
-    features: [
-      "Livraison rapide",
-      "Qualité garantie",
-      "Devis gratuit",
-      "Service client 24/7",
-      "Paiement sécurisé",
-      "Révisions illimitées"
-    ]
+    reviews: [
+      {
+        id: 1,
+        author: "Marie K.",
+        rating: 5,
+        date: "Il y a 2 jours",
+        comment: "Service excellent et rapide. Les flyers étaient parfaits et livrés dans les délais promis."
+      },
+      {
+        id: 2,
+        author: "Jean-Paul M.",
+        rating: 5,
+        date: "Il y a 1 semaine",
+        comment: "Très professionnel, qualité d'impression remarquable. Je recommande vivement !"
+      },
+      {
+        id: 3,
+        author: "Sarah L.",
+        rating: 4,
+        date: "Il y a 2 semaines",
+        comment: "Bon travail dans l'ensemble. Petit délai supplémentaire mais résultat final satisfaisant."
+      }
+    ],
+    certifications: [
+      "Certification Qualité ISO 9001",
+      "Impression Écologique",
+      "Formation Adobe Professional"
+    ],
+    workingHours: {
+      "Lundi - Vendredi": "8h00 - 18h00",
+      "Samedi": "9h00 - 15h00",
+      "Dimanche": "Fermé"
+    }
   };
 
   const handleContact = () => {
-    navigate('/contact-provider');
+    // Navigate to chat or contact form
+    console.log("Contact provider");
   };
 
   const handleOrder = () => {
-    navigate('/order-service');
+    // Navigate to order form
+    console.log("Order service");
   };
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-16 bg-gray-50">
       {/* Cover Image */}
       <div className="relative h-64 md:h-80">
         <img
           src={provider.coverImage}
-          alt={provider.name}
+          alt={`${provider.name} cover`}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="absolute bottom-4 left-4 right-4 text-white">
-          <div className="flex items-center space-x-4">
-            <img
-              src={provider.profileImage}
-              alt={provider.name}
-              className="w-20 h-20 rounded-full border-4 border-white"
-            />
-            <div>
-              <div className="flex items-center space-x-2 mb-1">
-                <h1 className="text-2xl font-bold">{provider.name}</h1>
-                <Badge variant="secondary" className="text-xs">
-                  {provider.badge}
-                </Badge>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
+        {/* Profile Header */}
+        <Card className="mb-6 bg-white shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6">
+              <div className="relative">
+                <img
+                  src={provider.image}
+                  alt={provider.name}
+                  className="w-32 h-32 rounded-xl object-cover border-4 border-white shadow-lg"
+                />
+                {provider.isOnline && (
+                  <div className="absolute -bottom-2 -right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                    En ligne
+                  </div>
+                )}
               </div>
-              <p className="text-sm opacity-90">{provider.category}</p>
-              <div className="flex items-center space-x-4 mt-1">
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm">{provider.rating}</span>
-                  <span className="text-xs opacity-75">({provider.reviews} avis)</span>
+              
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">{provider.name}</h1>
+                  {provider.isVerified && (
+                    <CheckCircle className="h-6 w-6 text-blue-500" />
+                  )}
                 </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm">{provider.location}</span>
+                
+                <p className="text-lg text-gray-600 mb-2">{provider.category}</p>
+                
+                <div className="flex flex-wrap items-center gap-4 mb-4">
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                    <span className="font-semibold">{provider.rating}</span>
+                    <span className="text-gray-500">({provider.completedProjects} projets)</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-1 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{provider.location}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-1 text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>Répond en {provider.responseTime}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-1 text-gray-600">
+                    <Users className="h-4 w-4" />
+                    <span>Membre depuis {provider.memberSince}</span>
+                  </div>
+                </div>
+
+                <div className="flex space-x-3">
+                  <Button
+                    onClick={handleContact}
+                    variant="outline"
+                    className="border-primary-200 text-primary-600 hover:bg-primary-50"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button
+                    onClick={handleOrder}
+                    className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+                  >
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                    Commander
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <Card>
-              <CardHeader>
-                <CardTitle>À propos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">{provider.description}</p>
-              </CardContent>
-            </Card>
+        {/* Tabs Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
+            <TabsTrigger value="overview">Aperçu</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="gallery">Galerie</TabsTrigger>
+            <TabsTrigger value="reviews">Avis</TabsTrigger>
+          </TabsList>
 
-            {/* Services */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Nos Services</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {provider.services.map((service, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900">{service.name}</h3>
-                        <span className="text-primary-600 font-medium text-sm">{service.price}</span>
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>À propos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">{provider.description}</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Certifications</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {provider.certifications.map((cert, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <Award className="h-4 w-4 text-yellow-500" />
+                          <span>{cert}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Statistiques</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Projets complétés</span>
+                      <span className="font-semibold">{provider.completedProjects}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Satisfaction client</span>
+                      <span className="font-semibold">{provider.clientSatisfaction}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Temps de réponse</span>
+                      <span className="font-semibold">{provider.responseTime}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Horaires</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(provider.workingHours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between text-sm">
+                        <span className="text-gray-600">{day}</span>
+                        <span className="font-medium">{hours}</span>
                       </div>
-                      <p className="text-gray-600 text-sm">{service.description}</p>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="services" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {provider.services.map((service, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-primary-600 font-semibold">{service.price}</span>
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        {service.duration}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    <Button className="w-full" onClick={handleOrder}>
+                      Commander ce service
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
 
-            {/* Portfolio */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Portfolio</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {provider.portfolio.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Portfolio ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <TabsContent value="gallery" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {provider.gallery.map((image, index) => (
+                <Card key={index} className="overflow-hidden">
+                  <img
+                    src={image}
+                    alt={`Travail ${index + 1}`}
+                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact Actions */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <Button
-                    className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
-                    onClick={handleOrder}
-                  >
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    Commander un service
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-primary-200 text-primary-600 hover:bg-primary-50"
-                    onClick={handleContact}
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Contacter
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Contact Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Informations de contact</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm">{provider.phone}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm">{provider.email}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <ExternalLink className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-primary-600 hover:underline cursor-pointer">
-                    {provider.website}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Nos avantages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {provider.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+          <TabsContent value="reviews" className="space-y-6">
+            <div className="space-y-6">
+              {provider.reviews.map((review) => (
+                <Card key={review.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold">{review.author}</h4>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < review.rating ? "text-yellow-500 fill-current" : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-500">{review.date}</span>
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                    <p className="text-gray-700">{review.comment}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
-      {/* Mobile padding */}
       <div className="h-20 md:h-0"></div>
     </div>
   );

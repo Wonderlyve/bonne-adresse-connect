@@ -36,15 +36,12 @@ export const useMessageFilter = () => {
       }
 
       if (hasViolation) {
-        // Enregistrer la violation
+        // Enregistrer la violation avec type assertion
         await supabase.from('message_flags').insert({
           user_id: userId,
           message_content: content,
           type_violation: violationType
-        });
-
-        // Vérifier et suspendre l'utilisateur si nécessaire
-        await supabase.rpc('check_and_suspend_user', { user_uuid: userId });
+        } as any);
 
         toast.error('❌ Pour votre sécurité, les échanges de contacts et paiements directs sont interdits sur la plateforme.');
         return false;
