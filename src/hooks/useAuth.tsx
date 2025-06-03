@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useProfile } from './useProfile';
 
 export interface User {
   name: string;
@@ -8,31 +8,27 @@ export interface User {
 }
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
-  }, []);
+  const { profile, user, loading, signOut } = useProfile();
 
   const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Cette fonction est maintenant gérée par Supabase Auth
+    console.log('Login via Supabase Auth');
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+    signOut();
   };
 
+  // Convertir le profil Supabase au format attendu par l'ancien système
+  const legacyUser = profile ? {
+    name: profile.full_name || profile.email,
+    email: profile.email,
+    userType: profile.user_type
+  } : null;
+
   return {
-    user,
-    isLoading,
+    user: legacyUser,
+    isLoading: loading,
     isAuthenticated: !!user,
     login,
     logout

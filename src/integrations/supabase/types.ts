@@ -9,424 +9,241 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      accounts: {
+      conversations: {
         Row: {
-          balance: number | null
           created_at: string | null
-          currency: Database["public"]["Enums"]["currency_type"] | null
           id: string
-          name: string
-          tenant_id: string | null
-          type: string
+          participant1_id: string | null
+          participant2_id: string | null
           updated_at: string | null
         }
         Insert: {
-          balance?: number | null
           created_at?: string | null
-          currency?: Database["public"]["Enums"]["currency_type"] | null
           id?: string
-          name: string
-          tenant_id?: string | null
-          type: string
+          participant1_id?: string | null
+          participant2_id?: string | null
           updated_at?: string | null
         }
         Update: {
-          balance?: number | null
           created_at?: string | null
-          currency?: Database["public"]["Enums"]["currency_type"] | null
           id?: string
-          name?: string
-          tenant_id?: string | null
-          type?: string
+          participant1_id?: string | null
+          participant2_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "accounts_tenant_id_fkey"
-            columns: ["tenant_id"]
+            foreignKeyName: "conversations_participant1_id_fkey"
+            columns: ["participant1_id"]
             isOneToOne: false
-            referencedRelation: "tenants"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_participant2_id_fkey"
+            columns: ["participant2_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      customers: {
+      message_flags: {
         Row: {
-          address: string | null
-          company: string | null
-          created_at: string | null
-          email: string | null
           id: string
-          name: string
-          phone: string | null
-          tenant_id: string | null
-          updated_at: string | null
+          message_content: string
+          timestamp: string | null
+          type_violation: string
+          user_id: string | null
         }
         Insert: {
-          address?: string | null
-          company?: string | null
-          created_at?: string | null
-          email?: string | null
           id?: string
-          name: string
-          phone?: string | null
-          tenant_id?: string | null
-          updated_at?: string | null
+          message_content: string
+          timestamp?: string | null
+          type_violation: string
+          user_id?: string | null
         }
         Update: {
-          address?: string | null
-          company?: string | null
-          created_at?: string | null
-          email?: string | null
           id?: string
-          name?: string
-          phone?: string | null
-          tenant_id?: string | null
-          updated_at?: string | null
+          message_content?: string
+          timestamp?: string | null
+          type_violation?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "customers_tenant_id_fkey"
-            columns: ["tenant_id"]
+            foreignKeyName: "message_flags_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "tenants"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      invoice_items: {
+      messages: {
         Row: {
+          content: string
+          conversation_id: string | null
           created_at: string | null
-          description: string | null
+          file_url: string | null
           id: string
-          invoice_id: string | null
-          name: string
-          quantity: number
-          total: number
-          unit_price: number
+          message_type: string | null
+          sender_id: string | null
         }
         Insert: {
+          content: string
+          conversation_id?: string | null
           created_at?: string | null
-          description?: string | null
+          file_url?: string | null
           id?: string
-          invoice_id?: string | null
-          name: string
-          quantity: number
-          total: number
-          unit_price: number
+          message_type?: string | null
+          sender_id?: string | null
         }
         Update: {
+          content?: string
+          conversation_id?: string | null
           created_at?: string | null
-          description?: string | null
+          file_url?: string | null
           id?: string
-          invoice_id?: string | null
-          name?: string
-          quantity?: number
-          total?: number
-          unit_price?: number
+          message_type?: string | null
+          sender_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "invoice_items_invoice_id_fkey"
-            columns: ["invoice_id"]
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
             isOneToOne: false
-            referencedRelation: "invoices"
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      invoices: {
+      orders: {
         Row: {
+          amount: number
+          client_id: string | null
           created_at: string | null
-          currency: Database["public"]["Enums"]["currency_type"] | null
-          customer_id: string | null
-          date: string
-          due_date: string | null
           id: string
-          invoice_number: string
-          notes: string | null
+          provider_id: string | null
+          service_name: string
           status: string | null
-          subtotal: number | null
-          tax_amount: number | null
-          tax_rate: number | null
-          tenant_id: string | null
-          total: number | null
           updated_at: string | null
         }
         Insert: {
+          amount: number
+          client_id?: string | null
           created_at?: string | null
-          currency?: Database["public"]["Enums"]["currency_type"] | null
-          customer_id?: string | null
-          date: string
-          due_date?: string | null
           id?: string
-          invoice_number: string
-          notes?: string | null
+          provider_id?: string | null
+          service_name: string
           status?: string | null
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_rate?: number | null
-          tenant_id?: string | null
-          total?: number | null
           updated_at?: string | null
         }
         Update: {
+          amount?: number
+          client_id?: string | null
           created_at?: string | null
-          currency?: Database["public"]["Enums"]["currency_type"] | null
-          customer_id?: string | null
-          date?: string
-          due_date?: string | null
           id?: string
-          invoice_number?: string
-          notes?: string | null
+          provider_id?: string | null
+          service_name?: string
           status?: string | null
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_rate?: number | null
-          tenant_id?: string | null
-          total?: number | null
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "invoices_customer_id_fkey"
-            columns: ["customer_id"]
+            foreignKeyName: "orders_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: "customers"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "invoices_tenant_id_fkey"
-            columns: ["tenant_id"]
+            foreignKeyName: "orders_provider_id_fkey"
+            columns: ["provider_id"]
             isOneToOne: false
-            referencedRelation: "tenants"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
       profiles: {
         Row: {
-          address: string | null
-          avatar_url: string | null
-          company_name: string | null
           created_at: string | null
           email: string
           full_name: string | null
           id: string
           phone: string | null
-          preferred_currency:
-            | Database["public"]["Enums"]["currency_type"]
-            | null
+          status: string | null
           updated_at: string | null
+          user_type: string | null
+          violation_count: number | null
         }
         Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          company_name?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
           id: string
           phone?: string | null
-          preferred_currency?:
-            | Database["public"]["Enums"]["currency_type"]
-            | null
+          status?: string | null
           updated_at?: string | null
+          user_type?: string | null
+          violation_count?: number | null
         }
         Update: {
-          address?: string | null
-          avatar_url?: string | null
-          company_name?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
           phone?: string | null
-          preferred_currency?:
-            | Database["public"]["Enums"]["currency_type"]
-            | null
+          status?: string | null
           updated_at?: string | null
+          user_type?: string | null
+          violation_count?: number | null
         }
         Relationships: []
       }
-      tenant_members: {
+      reports: {
         Row: {
-          created_at: string | null
           id: string
-          role: Database["public"]["Enums"]["user_role"] | null
-          tenant_id: string | null
-          user_id: string | null
+          reason: string
+          reported_user_id: string | null
+          reporter_id: string | null
+          timestamp: string | null
         }
         Insert: {
-          created_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["user_role"] | null
-          tenant_id?: string | null
-          user_id?: string | null
+          reason: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          timestamp?: string | null
         }
         Update: {
-          created_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["user_role"] | null
-          tenant_id?: string | null
-          user_id?: string | null
+          reason?: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          timestamp?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "tenant_members_tenant_id_fkey"
-            columns: ["tenant_id"]
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
             isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tenants: {
-        Row: {
-          created_at: string | null
-          id: string
-          name: string
-          owner_id: string | null
-          settings: Json | null
-          slug: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          name: string
-          owner_id?: string | null
-          settings?: Json | null
-          slug: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          name?: string
-          owner_id?: string | null
-          settings?: Json | null
-          slug?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      transactions: {
-        Row: {
-          account_id: string | null
-          amount: number
-          created_at: string | null
-          date: string
-          description: string | null
-          id: string
-          invoice_id: string | null
-          tenant_id: string | null
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          account_id?: string | null
-          amount: number
-          created_at?: string | null
-          date: string
-          description?: string | null
-          id?: string
-          invoice_id?: string | null
-          tenant_id?: string | null
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          account_id?: string | null
-          amount?: number
-          created_at?: string | null
-          date?: string
-          description?: string | null
-          id?: string
-          invoice_id?: string | null
-          tenant_id?: string | null
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "transactions_invoice_id_fkey"
-            columns: ["invoice_id"]
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
             isOneToOne: false
-            referencedRelation: "invoices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vcards: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          company: string | null
-          created_at: string | null
-          email: string | null
-          id: string
-          name: string
-          phone: string | null
-          qr_code_url: string | null
-          share_url: string | null
-          social_links: Json | null
-          tenant_id: string | null
-          title: string | null
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          company?: string | null
-          created_at?: string | null
-          email?: string | null
-          id?: string
-          name: string
-          phone?: string | null
-          qr_code_url?: string | null
-          share_url?: string | null
-          social_links?: Json | null
-          tenant_id?: string | null
-          title?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          company?: string | null
-          created_at?: string | null
-          email?: string | null
-          id?: string
-          name?: string
-          phone?: string | null
-          qr_code_url?: string | null
-          share_url?: string | null
-          social_links?: Json | null
-          tenant_id?: string | null
-          title?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vcards_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
