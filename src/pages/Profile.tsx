@@ -3,33 +3,69 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Settings, Star, Package, MessageCircle, Shield, Calendar, Heart, FileText } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User, Mail, Phone, MapPin, Settings, Star, Package, MessageCircle, Shield, Calendar, Heart, FileText, Camera, Upload } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
+import { useProfileUpdate } from "@/hooks/useProfileUpdate";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const [formData, setFormData] = useState({
+    full_name: "",
+    phone: ""
+  });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  
+  const { profile } = useProfile();
+  const { updateProfile, uploadAvatar, isUpdating, isUploadingAvatar } = useProfileUpdate();
+  const { user } = useAuthContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || "",
+        phone: profile.phone || ""
+      });
+    }
+  }, [profile]);
+
+  const handleSaveProfile = async () => {
+    const result = await updateProfile(formData);
+    if (!result.error && avatarFile) {
+      await uploadAvatar(avatarFile);
+      setAvatarFile(null);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+    }
+  };
 
   const userStats = [
-    { label: "Commandes", value: "23", icon: Package, color: "text-blue-600" },
-    { label: "Note moyenne", value: "4.8", icon: Star, color: "text-yellow-600" },
-    { label: "Messages", value: "156", icon: MessageCircle, color: "text-green-600" },
-    { label: "Favoris", value: "12", icon: Heart, color: "text-red-600" },
+    { label: "Commandes", value: "0", icon: Package, color: "text-blue-600" },
+    { label: "Note moyenne", value: "5.0", icon: Star, color: "text-yellow-600" },
+    { label: "Messages", value: "0", icon: MessageCircle, color: "text-green-600" },
+    { label: "Favoris", value: "0", icon: Heart, color: "text-red-600" },
   ];
 
   const recentOrders = [
-    { id: "CMD-001", service: "Impression Flyers", provider: "Print Express", status: "Livré", date: "15 Jan 2024" },
-    { id: "CMD-002", service: "Logo Design", provider: "Creative Studio", status: "En cours", date: "20 Jan 2024" },
-    { id: "CMD-003", service: "Plan Architecture", provider: "Archi Plus", status: "En attente", date: "22 Jan 2024" },
+    { id: "CMD-001", service: "Aucune commande", provider: "En attente", status: "Nouveau", date: new Date().toLocaleDateString() },
   ];
 
-  const favoriteProviders = [
-    { name: "Print Express", category: "Imprimerie", rating: 4.8 },
-    { name: "Creative Studio", category: "Design", rating: 4.9 },
-    { name: "Archi Plus", category: "Architecture", rating: 4.7 },
-  ];
+  if (!user || !profile) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-16 flex items-center justify-center">
+        <p>Chargement...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -40,43 +76,43 @@ const Profile = () => {
           <CardContent className="pt-0">
             <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 -mt-16 relative">
               <div className="relative">
-                <img
-                  src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face"
-                  alt="Profile"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                />
+                <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
+                  <AvatarImage 
+                    src={profile.avatar_url || undefined} 
+                    alt="Profile" 
+                  />
+                  <AvatarFallback className="text-2xl bg-primary-100">
+                    {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <Badge className="absolute -bottom-2 -right-2 bg-green-500 text-white">
                   <Shield className="h-3 w-3 mr-1" />
                   Vérifié
                 </Badge>
               </div>
               <div className="text-center md:text-left flex-1 mt-4 md:mt-16">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Marie Ngoma</h1>
-                <p className="text-gray-600 mb-2">Cliente depuis Mars 2023</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {profile.full_name || profile.email}
+                </h1>
+                <p className="text-gray-600 mb-2">
+                  {profile.user_type === 'client' ? 'Client' : 'Prestataire'} depuis {new Date(profile.created_at).toLocaleDateString()}
+                </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <Mail className="h-4 w-4 mr-1" />
-                    marie.ngoma@email.com
+                    {profile.email}
                   </div>
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-1" />
-                    +243 123 456 789
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Kinshasa, RDC
-                  </div>
+                  {profile.phone && (
+                    <div className="flex items-center">
+                      <Phone className="h-4 w-4 mr-1" />
+                      {profile.phone}
+                    </div>
+                  )}
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
-                    Membre depuis 10 mois
+                    Membre depuis {Math.ceil((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30))} mois
                   </div>
                 </div>
-              </div>
-              <div className="mt-4 md:mt-16">
-                <Button variant="outline" className="flex items-center">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Modifier le profil
-                </Button>
               </div>
             </div>
           </CardContent>
@@ -160,51 +196,96 @@ const Profile = () => {
               <CardContent>
                 {activeTab === "profile" && (
                   <div className="space-y-6">
+                    {/* Photo de profil */}
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage 
+                          src={profile.avatar_url || undefined} 
+                          alt="Profile" 
+                        />
+                        <AvatarFallback className="text-lg">
+                          {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <Label htmlFor="avatar-upload" className="cursor-pointer">
+                          <div className="flex items-center space-x-2 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-md transition-colors">
+                            <Camera className="h-4 w-4" />
+                            <span>Changer la photo</span>
+                          </div>
+                        </Label>
+                        <Input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarChange}
+                          className="hidden"
+                        />
+                        {avatarFile && (
+                          <p className="text-sm text-green-600 mt-1">
+                            Nouvelle photo sélectionnée: {avatarFile.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
-                        <input
-                          type="text"
-                          value="Marie Ngoma"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        <Label htmlFor="full_name">Nom complet</Label>
+                        <Input
+                          id="full_name"
+                          value={formData.full_name}
+                          onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                          placeholder="Votre nom complet"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input
-                          type="email"
-                          value="marie.ngoma@email.com"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          value={profile.email}
+                          disabled
+                          className="bg-gray-100"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
-                        <input
-                          type="tel"
-                          value="+243 123 456 789"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        <Label htmlFor="phone">Téléphone</Label>
+                        <Input
+                          id="phone"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          placeholder="+243 XXX XXX XXX"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
-                        <input
-                          type="text"
-                          value="Kinshasa"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                        <textarea
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                          placeholder="Parlez-nous un peu de vous..."
+                        <Label htmlFor="user_type">Type de compte</Label>
+                        <Input
+                          id="user_type"
+                          value={profile.user_type === 'client' ? 'Client' : 'Prestataire'}
+                          disabled
+                          className="bg-gray-100"
                         />
                       </div>
                     </div>
                     <div className="flex space-x-4">
-                      <Button>Sauvegarder les modifications</Button>
-                      <Button variant="outline">Annuler</Button>
+                      <Button 
+                        onClick={handleSaveProfile}
+                        disabled={isUpdating || isUploadingAvatar}
+                      >
+                        {isUpdating || isUploadingAvatar ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setFormData({
+                            full_name: profile.full_name || "",
+                            phone: profile.phone || ""
+                          });
+                          setAvatarFile(null);
+                        }}
+                      >
+                        Annuler
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -217,31 +298,18 @@ const Profile = () => {
                           <h4 className="font-medium">{order.service}</h4>
                           <p className="text-sm text-gray-600">{order.provider} • {order.date}</p>
                         </div>
-                        <Badge variant={order.status === "Livré" ? "default" : "secondary"}>
+                        <Badge variant="secondary">
                           {order.status}
                         </Badge>
                       </div>
                     ))}
-                    <Button variant="outline" className="w-full">
-                      Voir toutes les commandes
-                    </Button>
                   </div>
                 )}
 
                 {activeTab === "favorites" && (
-                  <div className="space-y-4">
-                    {favoriteProviders.map((provider) => (
-                      <div key={provider.name} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{provider.name}</h4>
-                          <p className="text-sm text-gray-600">{provider.category}</p>
-                        </div>
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                          <span className="text-sm">{provider.rating}</span>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-center py-8">
+                    <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Aucun prestataire favori pour le moment</p>
                   </div>
                 )}
 
@@ -265,15 +333,11 @@ const Profile = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Commande CMD-002 mise à jour</span>
+                    <span>Profil créé</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Nouveau message reçu</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span>Évaluation ajoutée</span>
+                    <span>Compte vérifié</span>
                   </div>
                 </div>
               </CardContent>
