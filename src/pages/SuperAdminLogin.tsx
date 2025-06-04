@@ -106,7 +106,7 @@ const SuperAdminLogin = () => {
               <p className="text-sm text-blue-700">
                 <strong>Identifiants par défaut :</strong><br/>
                 Email: superadmin@super.com<br/>
-                Mot de passe: Mysuperadminwonder2020
+                Mot de passe: Mysuperadminwonder2020🔧
               </p>
             </div>
 
