@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Zap } from "lucide-react";
 
 const SearchSection = () => {
   const navigate = useNavigate();
@@ -21,6 +21,10 @@ const SearchSection = () => {
     }
     
     navigate(`/providers?${params.toString()}`);
+  };
+
+  const handleQuickService = () => {
+    navigate('/services');
   };
 
   return (
@@ -49,12 +53,23 @@ const SearchSection = () => {
               className="w-full px-3 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:outline-none text-gray-700 placeholder-gray-400 text-sm"
             />
           </div>
-          <Button 
-            type="submit"
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform transition-all duration-200 hover:scale-105 shadow-md text-sm"
-          >
-            Rechercher
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              type="submit"
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform transition-all duration-200 hover:scale-105 shadow-md text-sm"
+            >
+              Rechercher
+            </Button>
+            <Button 
+              type="button"
+              onClick={handleQuickService}
+              variant="outline"
+              className="px-4 py-3 rounded-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-50 transition-all duration-200 text-sm whitespace-nowrap"
+            >
+              <Zap className="h-4 w-4 mr-1" />
+              Service rapide
+            </Button>
+          </div>
         </form>
       </div>
     </section>
