@@ -3,83 +3,32 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Settings, Star, Package, MessageCircle, Shield, Calendar, Heart, FileText, Camera } from "lucide-react";
-import { useProfile } from "@/hooks/useProfile";
-import { useProfileUpdate } from "@/hooks/useProfileUpdate";
-import { toast } from "sonner";
+import { User, Mail, Phone, MapPin, Settings, Star, Package, MessageCircle, Shield, Calendar, Heart, FileText } from "lucide-react";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    phone: ""
-  });
-
-  const { profile, loading } = useProfile();
-  const { updateProfile, uploadProfilePhoto, isUpdating, isUploadingPhoto } = useProfileUpdate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        full_name: profile.full_name || "",
-        email: profile.email || "",
-        phone: profile.phone || ""
-      });
-    }
-  }, [profile]);
-
-  const handleSave = async () => {
-    const success = await updateProfile(formData);
-    if (success) {
-      setIsEditing(false);
-    }
-  };
-
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La taille du fichier ne doit pas dépasser 5MB");
-      return;
-    }
-
-    await uploadProfilePhoto(file);
-    window.location.reload(); // Recharger pour voir la nouvelle photo
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-16 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement du profil...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-16 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Profil non trouvé</p>
-        </div>
-      </div>
-    );
-  }
-
   const userStats = [
-    { label: "Commandes", value: "0", icon: Package, color: "text-blue-600" },
-    { label: "Note moyenne", value: "5.0", icon: Star, color: "text-yellow-600" },
-    { label: "Messages", value: "0", icon: MessageCircle, color: "text-green-600" },
-    { label: "Favoris", value: "0", icon: Heart, color: "text-red-600" },
+    { label: "Commandes", value: "23", icon: Package, color: "text-blue-600" },
+    { label: "Note moyenne", value: "4.8", icon: Star, color: "text-yellow-600" },
+    { label: "Messages", value: "156", icon: MessageCircle, color: "text-green-600" },
+    { label: "Favoris", value: "12", icon: Heart, color: "text-red-600" },
+  ];
+
+  const recentOrders = [
+    { id: "CMD-001", service: "Impression Flyers", provider: "Print Express", status: "Livré", date: "15 Jan 2024" },
+    { id: "CMD-002", service: "Logo Design", provider: "Creative Studio", status: "En cours", date: "20 Jan 2024" },
+    { id: "CMD-003", service: "Plan Architecture", provider: "Archi Plus", status: "En attente", date: "22 Jan 2024" },
+  ];
+
+  const favoriteProviders = [
+    { name: "Print Express", category: "Imprimerie", rating: 4.8 },
+    { name: "Creative Studio", category: "Design", rating: 4.9 },
+    { name: "Archi Plus", category: "Architecture", rating: 4.7 },
   ];
 
   return (
@@ -92,57 +41,41 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 -mt-16 relative">
               <div className="relative">
                 <img
-                  src={profile.avatar_url || "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face"}
+                  src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face"
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
                 />
-                <label className="absolute -bottom-2 -right-2 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors">
-                  <Camera className="h-4 w-4" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={isUploadingPhoto}
-                  />
-                </label>
-                <Badge className="absolute -bottom-2 -left-2 bg-green-500 text-white">
+                <Badge className="absolute -bottom-2 -right-2 bg-green-500 text-white">
                   <Shield className="h-3 w-3 mr-1" />
                   Vérifié
                 </Badge>
               </div>
               <div className="text-center md:text-left flex-1 mt-4 md:mt-16">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {profile.full_name || profile.email}
-                </h1>
-                <p className="text-gray-600 mb-2">
-                  {profile.user_type === 'provider' ? 'Prestataire' : 'Client'} depuis {new Date(profile.created_at).toLocaleDateString()}
-                </p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Marie Ngoma</h1>
+                <p className="text-gray-600 mb-2">Cliente depuis Mars 2023</p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <Mail className="h-4 w-4 mr-1" />
-                    {profile.email}
+                    marie.ngoma@email.com
                   </div>
-                  {profile.phone && (
-                    <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-1" />
-                      {profile.phone}
-                    </div>
-                  )}
+                  <div className="flex items-center">
+                    <Phone className="h-4 w-4 mr-1" />
+                    +243 123 456 789
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    Kinshasa, RDC
+                  </div>
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
-                    Membre depuis {Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30))} mois
+                    Membre depuis 10 mois
                   </div>
                 </div>
               </div>
               <div className="mt-4 md:mt-16">
-                <Button
-                  variant="outline"
-                  className="flex items-center"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
+                <Button variant="outline" className="flex items-center">
                   <Settings className="h-4 w-4 mr-2" />
-                  {isEditing ? "Annuler" : "Modifier le profil"}
+                  Modifier le profil
                 </Button>
               </div>
             </div>
@@ -232,57 +165,83 @@ const Profile = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
                         <input
                           type="text"
-                          value={formData.full_name}
-                          onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                          disabled={!isEditing}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none disabled:bg-gray-100"
+                          value="Marie Ngoma"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <input
                           type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          disabled={!isEditing}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none disabled:bg-gray-100"
+                          value="marie.ngoma@email.com"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
                         <input
                           type="tel"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          disabled={!isEditing}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none disabled:bg-gray-100"
+                          value="+243 123 456 789"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+                        <input
+                          type="text"
+                          value="Kinshasa"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                        <textarea
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                          placeholder="Parlez-nous un peu de vous..."
                         />
                       </div>
                     </div>
-                    {isEditing && (
-                      <div className="flex space-x-4">
-                        <Button onClick={handleSave} disabled={isUpdating}>
-                          {isUpdating ? "Sauvegarde..." : "Sauvegarder les modifications"}
-                        </Button>
-                        <Button variant="outline" onClick={() => setIsEditing(false)}>
-                          Annuler
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex space-x-4">
+                      <Button>Sauvegarder les modifications</Button>
+                      <Button variant="outline">Annuler</Button>
+                    </div>
                   </div>
                 )}
 
                 {activeTab === "orders" && (
-                  <div className="text-center py-8">
-                    <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Aucune commande pour le moment</p>
+                  <div className="space-y-4">
+                    {recentOrders.map((order) => (
+                      <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{order.service}</h4>
+                          <p className="text-sm text-gray-600">{order.provider} • {order.date}</p>
+                        </div>
+                        <Badge variant={order.status === "Livré" ? "default" : "secondary"}>
+                          {order.status}
+                        </Badge>
+                      </div>
+                    ))}
+                    <Button variant="outline" className="w-full">
+                      Voir toutes les commandes
+                    </Button>
                   </div>
                 )}
 
                 {activeTab === "favorites" && (
-                  <div className="text-center py-8">
-                    <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Aucun favori pour le moment</p>
+                  <div className="space-y-4">
+                    {favoriteProviders.map((provider) => (
+                      <div key={provider.name} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{provider.name}</h4>
+                          <p className="text-sm text-gray-600">{provider.category}</p>
+                        </div>
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                          <span className="text-sm">{provider.rating}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -306,11 +265,15 @@ const Profile = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Profil créé</span>
+                    <span>Commande CMD-002 mise à jour</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Compte vérifié</span>
+                    <span>Nouveau message reçu</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>Évaluation ajoutée</span>
                   </div>
                 </div>
               </CardContent>
