@@ -1,8 +1,15 @@
 
 import { Button } from "@/components/ui/button";
-import { Search, ArrowDown } from "lucide-react";
+import { Search, ArrowDown, Truck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleQuickService = () => {
+    navigate("/services");
+  };
+
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background with gradient */}
@@ -45,9 +52,20 @@ const HeroSection = () => {
                   className="w-full px-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:outline-none text-gray-700 placeholder-gray-400"
                 />
               </div>
-              <Button className="px-8 py-4 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform transition-all duration-200 hover:scale-105 shadow-lg">
-                Rechercher
-              </Button>
+              <div className="flex gap-2">
+                <Button className="px-6 py-4 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform transition-all duration-200 hover:scale-105 shadow-lg">
+                  Rechercher
+                </Button>
+                <Button 
+                  onClick={handleQuickService}
+                  variant="outline"
+                  className="px-4 py-4 rounded-xl border-primary-600 text-primary-600 hover:bg-primary-50 flex items-center whitespace-nowrap"
+                  title="Service rapide"
+                >
+                  <Truck className="h-4 w-4 mr-1" />
+                  Service rapide
+                </Button>
+              </div>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import SearchSection from "@/components/SearchSection";
+import HeroSection from "@/components/HeroSection";
 import FeaturedProviders from "@/components/FeaturedProviders";
 
 const Index = () => {
@@ -10,7 +10,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pt-16">
-      <SearchSection />
+      <HeroSection />
       <FeaturedProviders />
       
       {/* Mobile padding to account for bottom navigation */}

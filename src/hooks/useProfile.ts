@@ -8,6 +8,7 @@ export interface Profile {
   email: string;
   full_name: string | null;
   phone: string | null;
+  avatar_url: string | null;
   user_type: 'client' | 'provider';
   status: 'active' | 'suspended';
   violation_count: number;
@@ -21,12 +22,31 @@ export const useProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProfile();
+    // Récupération immédiate de la session existante
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user);
+          await getProfile(session.user.id);
+        } else {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération de la session:', error);
+        setLoading(false);
+      }
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    getInitialSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
-        getProfile();
+        // Utiliser setTimeout pour éviter les deadlocks
+        setTimeout(() => {
+          getProfile(session.user.id);
+        }, 0);
       } else {
         setUser(null);
         setProfile(null);
@@ -37,42 +57,39 @@ export const useProfile = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const getProfile = async () => {
+  const getProfile = async (userId?: string) => {
     try {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
+      const targetUserId = userId || user?.id;
+      if (!targetUserId) {
         setLoading(false);
         return;
       }
 
-      setUser(session.user);
-
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
-        .single();
+        .eq('id', targetUserId)
+        .maybeSingle();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         throw error;
       }
 
-      // Type assertion pour s'assurer que les types correspondent
-      const profileData: Profile = {
-        id: data.id,
-        email: data.email,
-        full_name: data.full_name,
-        phone: data.phone,
-        user_type: data.user_type as 'client' | 'provider',
-        status: data.status as 'active' | 'suspended',
-        violation_count: data.violation_count,
-        created_at: data.created_at,
-        updated_at: data.updated_at
-      };
-
-      setProfile(profileData);
+      if (data) {
+        const profileData: Profile = {
+          id: data.id,
+          email: data.email,
+          full_name: data.full_name,
+          phone: data.phone,
+          avatar_url: data.avatar_url,
+          user_type: data.user_type as 'client' | 'provider',
+          status: data.status as 'active' | 'suspended',
+          violation_count: data.violation_count || 0,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        };
+        setProfile(profileData);
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération du profil:', error);
     } finally {
