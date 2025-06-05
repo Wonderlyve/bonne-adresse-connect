@@ -16,16 +16,38 @@ import {
   Shield,
   Eye,
   DollarSign,
-  Activity
+  Activity,
+  Settings,
+  Package,
+  Lock,
+  EyeOff
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
   const [isCreateAdOpen, setIsCreateAdOpen] = useState(false);
+  const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false);
+  const [isServiceManagementOpen, setIsServiceManagementOpen] = useState(false);
+  
+  // État pour créer une publicité
   const [adTitle, setAdTitle] = useState("");
   const [adDescription, setAdDescription] = useState("");
   const [adImage, setAdImage] = useState("");
   const [adLink, setAdLink] = useState("");
+  
+  // État pour changer le mot de passe
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
+  
+  // État pour gestion des services
+  const [serviceName, setServiceName] = useState("");
+  const [serviceDescription, setServiceDescription] = useState("");
+  const [servicePrice, setServicePrice] = useState("");
+  const [serviceCategory, setServiceCategory] = useState("");
 
   const handleLogout = () => {
     localStorage.removeItem('superAdmin');
@@ -35,11 +57,54 @@ const SuperAdminDashboard = () => {
   const handleCreateAd = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Creating ad:", { adTitle, adDescription, adImage, adLink });
+    toast.success("Publicité créée avec succès");
     setIsCreateAdOpen(false);
     setAdTitle("");
     setAdDescription("");
     setAdImage("");
     setAdLink("");
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      toast.success("Mot de passe modifié avec succès");
+      setIsPasswordChangeOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error('Erreur changement mot de passe:', error);
+      toast.error(error.message || "Erreur lors du changement de mot de passe");
+    }
+  };
+
+  const handleServiceManagement = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Managing service:", { serviceName, serviceDescription, servicePrice, serviceCategory });
+    toast.success("Service géré avec succès");
+    setIsServiceManagementOpen(false);
+    setServiceName("");
+    setServiceDescription("");
+    setServicePrice("");
+    setServiceCategory("");
   };
 
   const stats = [
@@ -65,9 +130,9 @@ const SuperAdminDashboard = () => {
       color: "text-orange-600"
     },
     {
-      title: "Boosts Actifs",
+      title: "Services Actifs",
       value: "67",
-      icon: TrendingUp,
+      icon: Package,
       description: "+15% ce mois",
       color: "text-purple-600"
     },
@@ -99,10 +164,64 @@ const SuperAdminDashboard = () => {
                 Tableau de Bord Super Admin
               </h1>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Déconnexion
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Dialog open={isPasswordChangeOpen} onOpenChange={setIsPasswordChangeOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Lock className="h-4 w-4 mr-2" />
+                    Mot de passe
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Changer le mot de passe</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Mot de passe actuel</label>
+                      <div className="relative">
+                        <Input
+                          type={showPasswords ? "text" : "password"}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowPasswords(!showPasswords)}
+                        >
+                          {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    <Input
+                      type={showPasswords ? "text" : "password"}
+                      placeholder="Nouveau mot de passe"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                    <Input
+                      type={showPasswords ? "text" : "password"}
+                      placeholder="Confirmer le nouveau mot de passe"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <Button type="submit" className="w-full">
+                      Changer le mot de passe
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Déconnexion
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -132,7 +251,7 @@ const SuperAdminDashboard = () => {
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Create Native Ad */}
           <Card>
             <CardHeader>
@@ -190,6 +309,63 @@ const SuperAdminDashboard = () => {
             </CardContent>
           </Card>
 
+          {/* Service Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Package className="h-5 w-5" />
+                <span>Gestion des Services</span>
+              </CardTitle>
+              <CardDescription>
+                Gérer les services disponibles sur la plateforme
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Dialog open={isServiceManagementOpen} onOpenChange={setIsServiceManagementOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Gérer les Services
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Gestion des Services</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleServiceManagement} className="space-y-4">
+                    <Input
+                      placeholder="Nom du service"
+                      value={serviceName}
+                      onChange={(e) => setServiceName(e.target.value)}
+                      required
+                    />
+                    <Textarea
+                      placeholder="Description du service"
+                      value={serviceDescription}
+                      onChange={(e) => setServiceDescription(e.target.value)}
+                      required
+                    />
+                    <Input
+                      placeholder="Prix (ex: À partir de 25 000 FC)"
+                      value={servicePrice}
+                      onChange={(e) => setServicePrice(e.target.value)}
+                      required
+                    />
+                    <Input
+                      placeholder="Catégorie"
+                      value={serviceCategory}
+                      onChange={(e) => setServiceCategory(e.target.value)}
+                      required
+                    />
+                    <Button type="submit" className="w-full">
+                      Ajouter/Modifier le Service
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+
           {/* Quick Actions */}
           <Card>
             <CardHeader>
@@ -210,9 +386,13 @@ const SuperAdminDashboard = () => {
                 <Store className="h-4 w-4 mr-2" />
                 Gérer les Prestataires
               </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Analyser les Performances
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => navigate('/services')}
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Voir la Page Services
               </Button>
             </CardContent>
           </Card>
@@ -243,10 +423,10 @@ const SuperAdminDashboard = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <ShoppingCart className="h-4 w-4 text-orange-600" />
+                <Package className="h-4 w-4 text-purple-600" />
                 <div>
-                  <p className="text-sm font-medium">Nouvelle commande passée</p>
-                  <p className="text-xs text-gray-500">Il y a 18 minutes</p>
+                  <p className="text-sm font-medium">Nouveau service ajouté</p>
+                  <p className="text-xs text-gray-500">Il y a 25 minutes</p>
                 </div>
               </div>
             </div>

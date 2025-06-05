@@ -63,10 +63,10 @@ const SearchSection = () => {
             <Button 
               type="button"
               onClick={handleQuickService}
-              className="px-6 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform transition-all duration-200 hover:scale-105 shadow-md text-sm whitespace-nowrap"
+              className="px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform transition-all duration-200 hover:scale-105 shadow-md text-sm whitespace-nowrap"
             >
-              <Zap className="h-4 w-4 mr-2" />
-              Service rapide
+              <Zap className="h-4 w-4 mr-1" />
+              Rapide
             </Button>
           </div>
         </form>
