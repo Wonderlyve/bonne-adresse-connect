@@ -1,11 +1,12 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, MessageCircle, ShoppingBag, ExternalLink } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { useConversations } from "@/hooks/useConversations";
 
 const FeaturedProviders = () => {
   const navigate = useNavigate();
+  const { createOrFindConversation, isCreating } = useConversations();
 
   const providerCategories = [
     {
@@ -401,10 +402,6 @@ const FeaturedProviders = () => {
     }
   };
 
-  const handleContact = () => {
-    navigate('/contact-provider');
-  };
-
   const handleOrder = () => {
     navigate('/order-service');
   };
@@ -523,11 +520,12 @@ const FeaturedProviders = () => {
               className="flex-1 border-primary-200 text-primary-600 hover:bg-primary-50 text-xs h-8 px-2"
               onClick={(e) => {
                 e.stopPropagation();
-                handleContact();
+                createOrFindConversation(provider.id);
               }}
+              disabled={isCreating}
             >
               <MessageCircle className="h-3 w-3 mr-1" />
-              Contacter
+              Message
             </Button>
             <Button
               size="sm"
