@@ -12,11 +12,10 @@ import {
   FileText,
   Image,
   Shirt,
-  Billboard,
+  Megaphone,
   Bookmark,
   Calendar,
-  Mail,
-  Megaphone
+  Mail
 } from "lucide-react";
 
 const Services = () => {
@@ -42,7 +41,7 @@ const Services = () => {
       name: "Affiches publicitaires",
       description: "Affiches grand format pour vos événements et promotions",
       price: "À partir de 15 000 FC",
-      icon: Billboard,
+      icon: Image,
       category: "Publicité",
       deliveryTime: "2-3 jours",
       features: ["Format A3, A2, A1", "Papier haute qualité", "Couleurs vives"]
@@ -112,7 +111,7 @@ const Services = () => {
       name: "Calicots et banderoles",
       description: "Banderoles en tissu pour événements et manifestations",
       price: "À partir de 25 000 FC",
-      icon: Billboard,
+      icon: Image,
       category: "Événements",
       deliveryTime: "2-3 jours",
       features: ["Tissu résistant", "Œillets renforcés", "Impression couleur"]
