@@ -9,7 +9,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen pt-16 py-16">
+    <div className="min-h-screen pt-16">
       <SearchSection />
       <FeaturedProviders />
       
