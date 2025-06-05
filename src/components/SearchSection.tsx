@@ -28,7 +28,7 @@ const SearchSection = () => {
   };
 
   return (
-    <section className="py-2 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Search Bar */}
       <div className="max-w-3xl mx-auto">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200/50">
@@ -63,10 +63,10 @@ const SearchSection = () => {
             <Button 
               type="button"
               onClick={handleQuickService}
-              className="px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform transition-all duration-200 hover:scale-105 shadow-md text-sm whitespace-nowrap"
+              className="px-3 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform transition-all duration-200 hover:scale-105 shadow-md text-sm whitespace-nowrap"
             >
               <Zap className="h-4 w-4 mr-1" />
-              Rapide
+              Service livré
             </Button>
           </div>
         </form>

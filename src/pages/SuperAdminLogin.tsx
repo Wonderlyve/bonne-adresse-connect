@@ -20,23 +20,50 @@ const SuperAdminLogin = () => {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      // Vérification des identifiants super admin avant l'authentification Supabase
+      if (email === "superadmin@super.com" && password === "Sublime2020") {
+        // Authentifier via Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          // Si l'utilisateur n'existe pas dans Supabase, on le crée
+          if (error.message.includes('Invalid login credentials')) {
+            const { error: signUpError } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  role: 'super_admin'
+                }
+              }
+            });
+            
+            if (signUpError) {
+              throw signUpError;
+            }
+            
+            // Réessayer la connexion après création
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+            
+            if (loginError) {
+              throw loginError;
+            }
+          } else {
+            throw error;
+          }
+        }
 
-      // Vérifier si c'est le super admin
-      if (email === "superadmin@super.com") {
         localStorage.setItem('superAdmin', 'true');
         navigate('/admin-dashboard');
         toast.success("Connexion réussie en tant que Super Administrateur");
       } else {
-        toast.error("Accès refusé - Réservé aux super administrateurs");
-        await supabase.auth.signOut();
+        toast.error("Identifiants incorrects - Vérifiez vos informations de connexion");
       }
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
