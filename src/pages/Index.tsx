@@ -1,12 +1,10 @@
 
-import { useEffect } from "react";
 import SearchSection from "@/components/SearchSection";
 import FeaturedProviders from "@/components/FeaturedProviders";
+import { usePageReset } from "@/hooks/usePageReset";
 
 const Index = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  usePageReset();
 
   return (
     <div className="min-h-screen">

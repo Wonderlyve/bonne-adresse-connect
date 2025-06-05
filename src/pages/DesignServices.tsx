@@ -3,11 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, MessageCircle, ShoppingBag, Palette } from "lucide-react";
+import { usePageReset } from "@/hooks/usePageReset";
 
 const DesignServices = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  usePageReset();
 
   const designers = [
     {

@@ -1,13 +1,11 @@
-
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building } from "lucide-react";
+import { usePageReset } from "@/hooks/usePageReset";
 
 const ArchitectureServices = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  usePageReset();
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">

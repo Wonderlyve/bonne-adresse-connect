@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { usePageReset } from "@/hooks/usePageReset";
 
 const SuperAdminLogin = () => {
+  usePageReset();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
