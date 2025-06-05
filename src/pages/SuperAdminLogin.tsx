@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SuperAdminLogin = () => {
@@ -15,32 +14,36 @@ const SuperAdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Credentials pour le super admin (en production, ceci devrait être dans une base de données sécurisée)
+  const SUPER_ADMIN_CREDENTIALS = {
+    email: "superadmin@labonneadresse.com",
+    password: "SuperAdmin2024!"
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      // Simulation d'une vérification d'authentification
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (error) {
-        throw error;
-      }
-
-      // Vérifier si c'est le super admin
-      if (email === "superadmin@super.com") {
-        localStorage.setItem('superAdmin', 'true');
+      if (email === SUPER_ADMIN_CREDENTIALS.email && password === SUPER_ADMIN_CREDENTIALS.password) {
+        // Stocker les informations de session super admin
+        localStorage.setItem('superAdminSession', JSON.stringify({
+          email: email,
+          loginTime: Date.now(),
+          sessionId: Math.random().toString(36).substr(2, 9)
+        }));
+        
         navigate('/admin-dashboard');
         toast.success("Connexion réussie en tant que Super Administrateur");
       } else {
-        toast.error("Accès refusé - Réservé aux super administrateurs");
-        await supabase.auth.signOut();
+        toast.error("Identifiants incorrects");
       }
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
-      toast.error(error.message || "Erreur de connexion");
+      toast.error("Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +70,7 @@ const SuperAdminLogin = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="superadmin@super.com"
+                placeholder="superadmin@labonneadresse.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -104,9 +107,9 @@ const SuperAdminLogin = () => {
             
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
               <p className="text-sm text-blue-700">
-                <strong>Identifiants par défaut :</strong><br/>
-                Email: superadmin@super.com<br/>
-                Mot de passe: Sublime2020
+                <strong>Identifiants de test :</strong><br/>
+                Email: superadmin@labonneadresse.com<br/>
+                Mot de passe: SuperAdmin2024!
               </p>
             </div>
 

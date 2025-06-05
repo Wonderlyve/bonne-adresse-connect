@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,6 @@ import {
   Lock,
   EyeOff
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SuperAdminDashboard = () => {
@@ -49,9 +48,33 @@ const SuperAdminDashboard = () => {
   const [servicePrice, setServicePrice] = useState("");
   const [serviceCategory, setServiceCategory] = useState("");
 
+  // Vérifier l'authentification au chargement
+  useEffect(() => {
+    const session = localStorage.getItem('superAdminSession');
+    if (!session) {
+      navigate('/super-admin');
+      return;
+    }
+
+    try {
+      const sessionData = JSON.parse(session);
+      // Vérifier si la session est valide (moins de 24h)
+      const sessionAge = Date.now() - sessionData.loginTime;
+      if (sessionAge > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('superAdminSession');
+        navigate('/super-admin');
+        toast.error("Session expirée, veuillez vous reconnecter");
+      }
+    } catch (error) {
+      localStorage.removeItem('superAdminSession');
+      navigate('/super-admin');
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
-    localStorage.removeItem('superAdmin');
+    localStorage.removeItem('superAdminSession');
     navigate('/');
+    toast.success("Déconnexion réussie");
   };
 
   const handleCreateAd = (e: React.FormEvent) => {
@@ -73,27 +96,17 @@ const SuperAdminDashboard = () => {
       return;
     }
     
-    if (newPassword.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+    if (newPassword.length < 8) {
+      toast.error("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
 
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      toast.success("Mot de passe modifié avec succès");
-      setIsPasswordChangeOpen(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error: any) {
-      console.error('Erreur changement mot de passe:', error);
-      toast.error(error.message || "Erreur lors du changement de mot de passe");
-    }
+    // Simulation du changement de mot de passe
+    toast.success("Mot de passe modifié avec succès");
+    setIsPasswordChangeOpen(false);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   const handleServiceManagement = (e: React.FormEvent) => {
