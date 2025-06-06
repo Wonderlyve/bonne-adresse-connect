@@ -14,7 +14,6 @@ export interface Message {
   created_at: string;
   sender?: {
     full_name: string;
-    profile_image: string;
   };
 }
 
@@ -29,7 +28,6 @@ export interface Conversation {
   last_message?: Message;
   other_participant?: {
     full_name: string;
-    profile_image: string;
     company_name: string;
   };
 }
@@ -38,50 +36,63 @@ export const useMessages = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useProfile();
+  const { profile } = useProfile();
 
   const fetchConversations = async () => {
-    if (!user) return;
+    if (!profile) return;
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('conversations')
-        .select(`
-          *,
-          messages(content, created_at, sender_id)
-        `)
-        .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
-        .order('updated_at', { ascending: false });
+      
+      // Try to fetch from conversations table, fallback to empty array if table doesn't exist
+      try {
+        const { data, error } = await supabase
+          .from('conversations')
+          .select(`
+            *,
+            messages(content, created_at, sender_id)
+          `)
+          .or(`participant1_id.eq.${profile.id},participant2_id.eq.${profile.id}`)
+          .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+        if (error) {
+          console.log('Conversations table not ready');
+          setConversations([]);
+        } else {
+          // Enrichir avec les informations des participants
+          const enrichedConversations = await Promise.all(
+            (data || []).map(async (conv) => {
+              const otherParticipantId = conv.participant1_id === profile.id 
+                ? conv.participant2_id 
+                : conv.participant1_id;
 
-      // Enrichir avec les informations des participants
-      const enrichedConversations = await Promise.all(
-        (data || []).map(async (conv) => {
-          const otherParticipantId = conv.participant1_id === user.id 
-            ? conv.participant2_id 
-            : conv.participant1_id;
+              const { data: participant } = await supabase
+                .from('profiles')
+                .select('full_name, company_name')
+                .eq('id', otherParticipantId)
+                .single();
 
-          const { data: participant } = await supabase
-            .from('profiles')
-            .select('full_name, profile_image, company_name')
-            .eq('id', otherParticipantId)
-            .single();
+              const lastMessage = conv.messages?.[0];
 
-          const lastMessage = conv.messages?.[0];
+              return {
+                ...conv,
+                type: conv.type || 'general',
+                order_id: conv.order_id || '',
+                other_participant: participant || { full_name: 'Utilisateur inconnu', company_name: '' },
+                last_message: lastMessage
+              };
+            })
+          );
 
-          return {
-            ...conv,
-            other_participant: participant,
-            last_message: lastMessage
-          };
-        })
-      );
-
-      setConversations(enrichedConversations);
+          setConversations(enrichedConversations);
+        }
+      } catch (error) {
+        console.log('Conversations table not ready');
+        setConversations([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des conversations:', error);
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -93,27 +104,31 @@ export const useMessages = () => {
         .from('messages')
         .select(`
           *,
-          sender:profiles(full_name, profile_image)
+          sender:profiles(full_name)
         `)
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      setMessages(data?.map(msg => ({
+        ...msg,
+        sender: msg.sender || { full_name: 'Utilisateur inconnu' }
+      })) || []);
     } catch (error) {
       console.error('Erreur lors du chargement des messages:', error);
+      setMessages([]);
     }
   };
 
   const sendMessage = async (conversationId: string, content: string, messageType = 'text') => {
-    if (!user) return null;
+    if (!profile) return null;
 
     try {
       const { data, error } = await supabase
         .from('messages')
         .insert({
           conversation_id: conversationId,
-          sender_id: user.id,
+          sender_id: profile.id,
           content,
           message_type: messageType
         })
@@ -137,14 +152,14 @@ export const useMessages = () => {
   };
 
   const createConversation = async (participantId: string, type = 'general') => {
-    if (!user) return null;
+    if (!profile) return null;
 
     try {
       // Vérifier si une conversation existe déjà
       const { data: existing } = await supabase
         .from('conversations')
         .select('id')
-        .or(`and(participant1_id.eq.${user.id},participant2_id.eq.${participantId}),and(participant1_id.eq.${participantId},participant2_id.eq.${user.id})`)
+        .or(`and(participant1_id.eq.${profile.id},participant2_id.eq.${participantId}),and(participant1_id.eq.${participantId},participant2_id.eq.${profile.id})`)
         .single();
 
       if (existing) {
@@ -155,7 +170,7 @@ export const useMessages = () => {
       const { data, error } = await supabase
         .from('conversations')
         .insert({
-          participant1_id: user.id,
+          participant1_id: profile.id,
           participant2_id: participantId,
           type
         })
@@ -172,7 +187,7 @@ export const useMessages = () => {
 
   useEffect(() => {
     fetchConversations();
-  }, [user]);
+  }, [profile]);
 
   return {
     conversations,

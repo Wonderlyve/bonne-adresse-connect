@@ -31,35 +31,56 @@ export interface Order {
 export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useProfile();
+  const { profile } = useProfile();
 
   const fetchOrders = async () => {
-    if (!user) return;
+    if (!profile) return;
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          client:profiles!client_id(full_name, email),
-          provider:profiles!provider_id(full_name, email, company_name)
-        `)
-        .or(`client_id.eq.${user.id},provider_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
+      
+      // Try to fetch from orders table, fallback to empty array if table doesn't exist
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            client:profiles!client_id(full_name, email),
+            provider:profiles!provider_id(full_name, email, company_name)
+          `)
+          .or(`client_id.eq.${profile.id},provider_id.eq.${profile.id}`)
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setOrders(data || []);
+        if (error) {
+          console.log('Orders table not ready');
+          setOrders([]);
+        } else {
+          const ordersWithDefaults = (data || []).map(order => ({
+            ...order,
+            description: order.description || '',
+            deadline: order.deadline || '',
+            delivery_date: order.delivery_date || '',
+            payment_method: order.payment_method || 'platform',
+            client: order.client || { full_name: 'Client inconnu', email: '' },
+            provider: order.provider || { full_name: 'Prestataire inconnu', email: '', company_name: '' }
+          }));
+          setOrders(ordersWithDefaults);
+        }
+      } catch (error) {
+        console.log('Orders table not ready');
+        setOrders([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des commandes:', error);
       toast.error('Erreur lors du chargement des commandes');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
   const createOrder = async (orderData: Partial<Order>) => {
-    if (!user) {
+    if (!profile) {
       toast.error('Vous devez être connecté pour passer commande');
       return null;
     }
@@ -69,13 +90,14 @@ export const useOrders = () => {
         .from('orders')
         .insert({
           ...orderData,
-          client_id: user.id
+          client_id: profile.id
         })
         .select()
         .single();
 
       if (error) throw error;
       toast.success('Commande créée avec succès');
+      fetchOrders(); // Refresh the list
       return data;
     } catch (error) {
       console.error('Erreur lors de la création de la commande:', error);
@@ -102,7 +124,7 @@ export const useOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [profile]);
 
   return {
     orders,

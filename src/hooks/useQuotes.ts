@@ -44,32 +44,47 @@ export const useQuotes = () => {
   const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useProfile();
+  const { profile } = useProfile();
 
   const fetchQuoteRequests = async () => {
-    if (!user) return;
+    if (!profile) return;
 
     try {
-      const { data, error } = await supabase
-        .from('quote_requests')
-        .select(`
-          *,
-          client:profiles!client_id(full_name, email),
-          provider:profiles!provider_id(full_name, email, company_name)
-        `)
-        .or(`client_id.eq.${user.id},provider_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
+      setLoading(true);
+      
+      // Try to fetch from quote_requests table, fallback to empty array if table doesn't exist
+      try {
+        const { data, error } = await supabase
+          .from('quote_requests')
+          .select(`
+            *,
+            client:profiles!client_id(full_name, email),
+            provider:profiles!provider_id(full_name, email, company_name)
+          `)
+          .or(`client_id.eq.${profile.id},provider_id.eq.${profile.id}`)
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setQuoteRequests(data || []);
+        if (error) {
+          console.log('Quote requests table not ready');
+          setQuoteRequests([]);
+        } else {
+          setQuoteRequests(data || []);
+        }
+      } catch (error) {
+        console.log('Quote requests table not ready');
+        setQuoteRequests([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des demandes de devis:', error);
       toast.error('Erreur lors du chargement des demandes de devis');
+      setQuoteRequests([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const createQuoteRequest = async (requestData: Partial<QuoteRequest>) => {
-    if (!user) {
+    if (!profile) {
       toast.error('Vous devez être connecté pour demander un devis');
       return null;
     }
@@ -79,13 +94,14 @@ export const useQuotes = () => {
         .from('quote_requests')
         .insert({
           ...requestData,
-          client_id: user.id
+          client_id: profile.id
         })
         .select()
         .single();
 
       if (error) throw error;
       toast.success('Demande de devis envoyée avec succès');
+      fetchQuoteRequests(); // Refresh the list
       return data;
     } catch (error) {
       console.error('Erreur lors de la création de la demande:', error);
@@ -95,7 +111,7 @@ export const useQuotes = () => {
   };
 
   const createQuote = async (quoteData: Partial<Quote>) => {
-    if (!user) {
+    if (!profile) {
       toast.error('Vous devez être connecté pour envoyer un devis');
       return null;
     }
@@ -105,7 +121,7 @@ export const useQuotes = () => {
         .from('quotes')
         .insert({
           ...quoteData,
-          provider_id: user.id
+          provider_id: profile.id
         })
         .select()
         .single();
@@ -122,7 +138,7 @@ export const useQuotes = () => {
 
   useEffect(() => {
     fetchQuoteRequests();
-  }, [user]);
+  }, [profile]);
 
   return {
     quoteRequests,

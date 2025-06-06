@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from './useProfile';
-import { toast } from 'sonner';
 
 export interface Notification {
   id: string;
@@ -19,25 +18,39 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user } = useProfile();
+  const { profile } = useProfile();
 
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!profile) return;
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
       
-      setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+      // Try to fetch from notifications table, fallback to empty array if table doesn't exist
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', profile.id)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.log('Notifications table not ready');
+          setNotifications([]);
+          setUnreadCount(0);
+        } else {
+          setNotifications(data || []);
+          setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+        }
+      } catch (error) {
+        console.log('Notifications table not ready');
+        setNotifications([]);
+        setUnreadCount(0);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des notifications:', error);
+      setNotifications([]);
+      setUnreadCount(0);
     } finally {
       setLoading(false);
     }
@@ -62,13 +75,13 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
-    if (!user) return;
+    if (!profile) return;
 
     try {
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
-        .eq('user_id', user.id)
+        .eq('user_id', profile.id)
         .eq('is_read', false);
 
       if (error) throw error;
@@ -84,31 +97,34 @@ export const useNotifications = () => {
     fetchNotifications();
 
     // Écouter les nouvelles notifications en temps réel
-    if (user) {
-      const channel = supabase
-        .channel('notifications')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${user.id}`
-          },
-          (payload) => {
-            const newNotification = payload.new as Notification;
-            setNotifications(prev => [newNotification, ...prev]);
-            setUnreadCount(prev => prev + 1);
-            toast.info(newNotification.title);
-          }
-        )
-        .subscribe();
+    if (profile) {
+      try {
+        const channel = supabase
+          .channel('notifications')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'notifications',
+              filter: `user_id=eq.${profile.id}`
+            },
+            (payload) => {
+              const newNotification = payload.new as Notification;
+              setNotifications(prev => [newNotification, ...prev]);
+              setUnreadCount(prev => prev + 1);
+            }
+          )
+          .subscribe();
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
+        return () => {
+          supabase.removeChannel(channel);
+        };
+      } catch (error) {
+        console.log('Real-time notifications not ready');
+      }
     }
-  }, [user]);
+  }, [profile]);
 
   return {
     notifications,

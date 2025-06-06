@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Users, 
   Store, 
@@ -23,9 +24,14 @@ import {
   EyeOff
 } from "lucide-react";
 import { toast } from "sonner";
+import { useServices } from "@/hooks/useServices";
+import { useAds } from "@/hooks/useAds";
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
+  const { createService } = useServices();
+  const { createAd } = useAds();
+  
   const [isCreateAdOpen, setIsCreateAdOpen] = useState(false);
   const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false);
   const [isServiceManagementOpen, setIsServiceManagementOpen] = useState(false);
@@ -45,8 +51,10 @@ const SuperAdminDashboard = () => {
   // État pour gestion des services
   const [serviceName, setServiceName] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
-  const [servicePrice, setServicePrice] = useState("");
+  const [servicePriceMin, setServicePriceMin] = useState("");
+  const [servicePriceMax, setServicePriceMax] = useState("");
   const [serviceCategory, setServiceCategory] = useState("");
+  const [serviceDeliveryTime, setServiceDeliveryTime] = useState("");
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
@@ -77,15 +85,26 @@ const SuperAdminDashboard = () => {
     toast.success("Déconnexion réussie");
   };
 
-  const handleCreateAd = (e: React.FormEvent) => {
+  const handleCreateAd = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Creating ad:", { adTitle, adDescription, adImage, adLink });
-    toast.success("Publicité créée avec succès");
-    setIsCreateAdOpen(false);
-    setAdTitle("");
-    setAdDescription("");
-    setAdImage("");
-    setAdLink("");
+    
+    const adData = {
+      title: adTitle,
+      description: adDescription,
+      image_url: adImage,
+      link_url: adLink,
+      is_active: true,
+      position: 'hero'
+    };
+
+    const result = await createAd(adData);
+    if (result) {
+      setIsCreateAdOpen(false);
+      setAdTitle("");
+      setAdDescription("");
+      setAdImage("");
+      setAdLink("");
+    }
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -109,15 +128,32 @@ const SuperAdminDashboard = () => {
     setConfirmPassword("");
   };
 
-  const handleServiceManagement = (e: React.FormEvent) => {
+  const handleServiceManagement = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Managing service:", { serviceName, serviceDescription, servicePrice, serviceCategory });
-    toast.success("Service géré avec succès");
-    setIsServiceManagementOpen(false);
-    setServiceName("");
-    setServiceDescription("");
-    setServicePrice("");
-    setServiceCategory("");
+    
+    // Créer un service avec un provider_id temporaire (super admin)
+    const serviceData = {
+      title: serviceName,
+      description: serviceDescription,
+      price_min: parseFloat(servicePriceMin) || 0,
+      price_max: parseFloat(servicePriceMax) || 0,
+      price_unit: 'USD',
+      delivery_time: serviceDeliveryTime,
+      category_id: serviceCategory,
+      is_active: true,
+      images: ['/placeholder.svg']
+    };
+
+    const result = await createService(serviceData);
+    if (result) {
+      setIsServiceManagementOpen(false);
+      setServiceName("");
+      setServiceDescription("");
+      setServicePriceMin("");
+      setServicePriceMax("");
+      setServiceCategory("");
+      setServiceDeliveryTime("");
+    }
   };
 
   const stats = [
@@ -358,20 +394,43 @@ const SuperAdminDashboard = () => {
                       onChange={(e) => setServiceDescription(e.target.value)}
                       required
                     />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        placeholder="Prix min"
+                        type="number"
+                        value={servicePriceMin}
+                        onChange={(e) => setServicePriceMin(e.target.value)}
+                        required
+                      />
+                      <Input
+                        placeholder="Prix max"
+                        type="number"
+                        value={servicePriceMax}
+                        onChange={(e) => setServicePriceMax(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Select value={serviceCategory} onValueChange={setServiceCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="imprimerie">Imprimerie</SelectItem>
+                        <SelectItem value="design-graphique">Design Graphique</SelectItem>
+                        <SelectItem value="architecture">Architecture</SelectItem>
+                        <SelectItem value="developpement">Développement</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="photographie">Photographie</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Input
-                      placeholder="Prix (ex: À partir de 25 000 FC)"
-                      value={servicePrice}
-                      onChange={(e) => setServicePrice(e.target.value)}
-                      required
-                    />
-                    <Input
-                      placeholder="Catégorie"
-                      value={serviceCategory}
-                      onChange={(e) => setServiceCategory(e.target.value)}
+                      placeholder="Délai de livraison (ex: 3-5 jours)"
+                      value={serviceDeliveryTime}
+                      onChange={(e) => setServiceDeliveryTime(e.target.value)}
                       required
                     />
                     <Button type="submit" className="w-full">
-                      Ajouter/Modifier le Service
+                      Ajouter le Service
                     </Button>
                   </form>
                 </DialogContent>
