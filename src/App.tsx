@@ -28,6 +28,7 @@ import Register from "./pages/Register";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import Navbar from "./components/Navbar";
 import MobileNav from "./components/MobileNav";
+import InstallPrompt from "./components/InstallPrompt";
 import AdDetail from "./pages/AdDetail";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
@@ -77,6 +78,7 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <MobileNav />
+                  <InstallPrompt />
                 </div>
               } 
             />

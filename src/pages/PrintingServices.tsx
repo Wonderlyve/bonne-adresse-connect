@@ -1,14 +1,12 @@
-
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, MessageCircle, ShoppingBag, Printer } from "lucide-react";
+import { usePageReset } from "@/hooks/usePageReset";
 
 const PrintingServices = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  usePageReset();
 
   const printers = [
     {

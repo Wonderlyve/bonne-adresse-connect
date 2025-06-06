@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { usePageReset } from "@/hooks/usePageReset";
 import { 
   Truck, 
   Clock, 
@@ -20,10 +21,7 @@ import {
 
 const Services = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  usePageReset();
 
   const services = [
     {
@@ -148,34 +146,41 @@ const Services = () => {
   };
 
   return (
-    <div className="min-h-screen py-16">
+    <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Services Rapides</h1>
-          <p className="text-xl text-gray-600 mb-6">
-            Tous nos services d'impression et de communication avec livraison à domicile
-          </p>
           
-          {/* Features highlights */}
-          <div className="flex flex-wrap justify-center gap-6 mb-8">
-            <div className="flex items-center space-x-2 text-green-600">
-              <Truck className="h-5 w-5" />
-              <span className="font-medium">Livraison à domicile</span>
-            </div>
-            <div className="flex items-center space-x-2 text-blue-600">
-              <Clock className="h-5 w-5" />
-              <span className="font-medium">Service rapide</span>
-            </div>
-            <div className="flex items-center space-x-2 text-yellow-600">
-              <Star className="h-5 w-5" />
-              <span className="font-medium">Qualité garantie</span>
-            </div>
-            <div className="flex items-center space-x-2 text-purple-600">
-              <CreditCard className="h-5 w-5" />
-              <span className="font-medium">Paiement sécurisé</span>
-            </div>
-          </div>
+          {/* Blue info card inspired by the uploaded image */}
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white mb-8 max-w-4xl mx-auto">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold mb-4">Services Rapides</h2>
+              <p className="text-lg mb-6 opacity-90">
+                Tous nos services d'impression et de communication avec livraison à domicile
+              </p>
+              
+              {/* Features highlights */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="flex items-center space-x-3">
+                  <Truck className="h-6 w-6 text-green-300" />
+                  <span className="font-medium">Livraison à domicile</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-6 w-6 text-blue-300" />
+                  <span className="font-medium">Service rapide</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Star className="h-6 w-6 text-yellow-300" />
+                  <span className="font-medium">Qualité garantie</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CreditCard className="h-6 w-6 text-purple-300" />
+                  <span className="font-medium">Paiement sécurisé</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Services Grid */}
@@ -208,9 +213,9 @@ const Services = () => {
 
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Price and delivery */}
+                    {/* Price and delivery - reduced price text size */}
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-primary-600">{service.price}</span>
+                      <span className="text-lg font-bold text-primary-600">{service.price}</span>
                       <div className="flex items-center text-sm text-gray-500">
                         <Clock className="h-4 w-4 mr-1" />
                         {service.deliveryTime}
