@@ -21,20 +21,24 @@ import {
   Settings,
   Package,
   Lock,
-  EyeOff
+  EyeOff,
+  Percent
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServices } from "@/hooks/useServices";
 import { useAds } from "@/hooks/useAds";
+import { usePromotions } from "@/hooks/usePromotions";
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
   const { createService } = useServices();
   const { createAd } = useAds();
+  const { createPromotion } = usePromotions();
   
   const [isCreateAdOpen, setIsCreateAdOpen] = useState(false);
   const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false);
   const [isServiceManagementOpen, setIsServiceManagementOpen] = useState(false);
+  const [isCreatePromotionOpen, setIsCreatePromotionOpen] = useState(false);
   
   // État pour créer une publicité
   const [adTitle, setAdTitle] = useState("");
@@ -55,6 +59,16 @@ const SuperAdminDashboard = () => {
   const [servicePriceMax, setServicePriceMax] = useState("");
   const [serviceCategory, setServiceCategory] = useState("");
   const [serviceDeliveryTime, setServiceDeliveryTime] = useState("");
+
+  // État pour créer une promotion
+  const [promotionTitle, setPromotionTitle] = useState("");
+  const [promotionDescription, setPromotionDescription] = useState("");
+  const [promotionCode, setPromotionCode] = useState("");
+  const [promotionDiscountType, setPromotionDiscountType] = useState("percentage");
+  const [promotionDiscountPercentage, setPromotionDiscountPercentage] = useState("");
+  const [promotionDiscountAmount, setPromotionDiscountAmount] = useState("");
+  const [promotionEndDate, setPromotionEndDate] = useState("");
+  const [promotionMaxUses, setPromotionMaxUses] = useState("");
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
@@ -153,6 +167,34 @@ const SuperAdminDashboard = () => {
       setServicePriceMax("");
       setServiceCategory("");
       setServiceDeliveryTime("");
+    }
+  };
+
+  const handleCreatePromotion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const promotionData = {
+      title: promotionTitle,
+      description: promotionDescription,
+      code: promotionCode,
+      discount_type: promotionDiscountType,
+      discount_percentage: promotionDiscountType === 'percentage' ? parseInt(promotionDiscountPercentage) : 0,
+      discount_amount: promotionDiscountType === 'fixed' ? parseFloat(promotionDiscountAmount) : 0,
+      end_date: promotionEndDate,
+      max_uses: parseInt(promotionMaxUses) || 0,
+      is_active: true
+    };
+
+    const result = await createPromotion(promotionData);
+    if (result) {
+      setIsCreatePromotionOpen(false);
+      setPromotionTitle("");
+      setPromotionDescription("");
+      setPromotionCode("");
+      setPromotionDiscountPercentage("");
+      setPromotionDiscountAmount("");
+      setPromotionEndDate("");
+      setPromotionMaxUses("");
     }
   };
 
@@ -300,16 +342,16 @@ const SuperAdminDashboard = () => {
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           {/* Create Native Ad */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Plus className="h-5 w-5" />
-                <span>Gestion des Publicités</span>
+                <span>Publicités</span>
               </CardTitle>
               <CardDescription>
-                Créer et gérer les publicités natives de l'application
+                Créer et gérer les publicités natives
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -363,10 +405,10 @@ const SuperAdminDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Package className="h-5 w-5" />
-                <span>Gestion des Services</span>
+                <span>Services</span>
               </CardTitle>
               <CardDescription>
-                Gérer les services disponibles sur la plateforme
+                Gérer les services de la plateforme
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -438,6 +480,95 @@ const SuperAdminDashboard = () => {
             </CardContent>
           </Card>
 
+          {/* Promotion Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Percent className="h-5 w-5" />
+                <span>Promotions</span>
+              </CardTitle>
+              <CardDescription>
+                Créer des promotions générales
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Dialog open={isCreatePromotionOpen} onOpenChange={setIsCreatePromotionOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer une Promotion
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Nouvelle Promotion</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreatePromotion} className="space-y-4">
+                    <Input
+                      placeholder="Titre de la promotion"
+                      value={promotionTitle}
+                      onChange={(e) => setPromotionTitle(e.target.value)}
+                      required
+                    />
+                    <Textarea
+                      placeholder="Description"
+                      value={promotionDescription}
+                      onChange={(e) => setPromotionDescription(e.target.value)}
+                      required
+                    />
+                    <Input
+                      placeholder="Code promo"
+                      value={promotionCode}
+                      onChange={(e) => setPromotionCode(e.target.value)}
+                      required
+                    />
+                    <Select value={promotionDiscountType} onValueChange={setPromotionDiscountType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="percentage">Pourcentage</SelectItem>
+                        <SelectItem value="fixed">Montant fixe</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {promotionDiscountType === 'percentage' ? (
+                      <Input
+                        type="number"
+                        placeholder="% de réduction"
+                        value={promotionDiscountPercentage}
+                        onChange={(e) => setPromotionDiscountPercentage(e.target.value)}
+                        required
+                      />
+                    ) : (
+                      <Input
+                        type="number"
+                        placeholder="Montant de réduction"
+                        value={promotionDiscountAmount}
+                        onChange={(e) => setPromotionDiscountAmount(e.target.value)}
+                        required
+                      />
+                    )}
+                    <Input
+                      type="date"
+                      placeholder="Date de fin"
+                      value={promotionEndDate}
+                      onChange={(e) => setPromotionEndDate(e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Utilisations max"
+                      value={promotionMaxUses}
+                      onChange={(e) => setPromotionMaxUses(e.target.value)}
+                    />
+                    <Button type="submit" className="w-full">
+                      Créer la Promotion
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+
           {/* Quick Actions */}
           <Card>
             <CardHeader>
@@ -446,7 +577,7 @@ const SuperAdminDashboard = () => {
                 <span>Actions Rapides</span>
               </CardTitle>
               <CardDescription>
-                Accès rapide aux fonctionnalités d'administration
+                Accès rapide aux fonctionnalités
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">

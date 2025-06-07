@@ -1,100 +1,110 @@
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, Clock, MessageCircle } from "lucide-react";
+import { Star, MapPin, Clock, MessageCircle, ShoppingCart } from "lucide-react";
 import { Service } from "@/hooks/useServices";
 
 interface ServiceCardProps {
   service: Service;
-  onContact?: (providerId: string) => void;
-  onOrder?: (service: Service) => void;
+  onContact: (providerId: string) => void;
+  onOrder: (service: Service) => void;
 }
 
 const ServiceCard = ({ service, onContact, onOrder }: ServiceCardProps) => {
-  const formatPrice = (min: number, max: number, unit: string) => {
-    if (min === max) {
-      return `${min} ${unit}`;
-    }
-    return `${min} - ${max} ${unit}`;
-  };
+  const rating = 4.8; // Mock rating
+  const reviewCount = 24; // Mock review count
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-      {service.images && service.images.length > 0 && (
-        <div className="aspect-video overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <CardHeader className="p-0">
+        <div className="relative h-48 overflow-hidden">
           <img
-            src={service.images[0]}
+            src={service.images?.[0] || '/placeholder.svg'}
             alt={service.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover"
           />
-        </div>
-      )}
-      
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <h3 className="font-bold text-lg line-clamp-2 group-hover:text-primary-600 transition-colors">
-            {service.title}
-          </h3>
-          <Badge variant="secondary" className="ml-2 whitespace-nowrap">
-            {service.category?.name}
-          </Badge>
-        </div>
-        
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <div className="flex items-center space-x-1">
-            <img
-              src={service.provider?.profile_image || "/placeholder.svg"}
-              alt={service.provider?.full_name}
-              className="w-5 h-5 rounded-full"
-            />
-            <span>{service.provider?.company_name || service.provider?.full_name}</span>
+          <div className="absolute top-2 right-2">
+            <Badge variant="secondary" className="bg-white/90">
+              {service.category?.name || 'Service'}
+            </Badge>
           </div>
         </div>
       </CardHeader>
-
-      <CardContent className="pb-3">
-        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+      
+      <CardContent className="p-4">
+        <CardTitle className="text-lg font-bold mb-2 line-clamp-2">
+          {service.title}
+        </CardTitle>
+        
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
           {service.description}
         </p>
         
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-1 text-gray-500">
-            <Clock className="h-4 w-4" />
-            <span>{service.delivery_time || "À définir"}</span>
+        <div className="flex items-center space-x-2 mb-3">
+          <div className="flex items-center">
+            <Star className="h-4 w-4 text-yellow-500 fill-current" />
+            <span className="ml-1 text-sm font-medium">{rating}</span>
+            <span className="ml-1 text-sm text-gray-500">({reviewCount})</span>
+          </div>
+        </div>
+        
+        {service.provider && (
+          <div className="flex items-center space-x-2 mb-3">
+            <img
+              src={service.provider.avatar_url || '/placeholder.svg'}
+              alt={service.provider.full_name}
+              className="w-8 h-8 rounded-full"
+            />
+            <div>
+              <p className="text-sm font-medium">{service.provider.full_name}</p>
+              <p className="text-xs text-gray-500">{service.provider.email}</p>
+            </div>
+          </div>
+        )}
+        
+        <div className="space-y-2">
+          <div className="flex items-center text-sm text-gray-600">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>Livraison: {service.delivery_time || '3-5 jours'}</span>
           </div>
           
-          <div className="flex items-center space-x-1">
-            <Star className="h-4 w-4 text-yellow-500 fill-current" />
-            <span className="text-gray-600">4.8</span>
+          {service.provider?.location && (
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="h-4 w-4 mr-1" />
+              <span>{service.provider.location}</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-lg font-bold text-primary-600">
+            ${service.price_min}
+            {service.price_max && service.price_max !== service.price_min && 
+              ` - $${service.price_max}`
+            }
           </div>
         </div>
       </CardContent>
-
-      <CardFooter className="pt-3 flex items-center justify-between">
-        <div className="text-lg font-bold text-primary-600">
-          {formatPrice(service.price_min, service.price_max, service.price_unit)}
-        </div>
-        
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onContact?.(service.provider_id)}
-            className="flex items-center space-x-1"
-          >
-            <MessageCircle className="h-4 w-4" />
-            <span>Contact</span>
-          </Button>
-          
-          <Button
-            size="sm"
-            onClick={() => onOrder?.(service)}
-            className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
-          >
-            Commander
-          </Button>
-        </div>
+      
+      <CardFooter className="p-4 pt-0 space-x-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => service.provider_id && onContact(service.provider_id)}
+          className="flex-1"
+        >
+          <MessageCircle className="h-4 w-4 mr-1" />
+          Contacter
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onOrder(service)}
+          className="flex-1"
+        >
+          <ShoppingCart className="h-4 w-4 mr-1" />
+          Commander
+        </Button>
       </CardFooter>
     </Card>
   );

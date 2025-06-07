@@ -212,6 +212,202 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          code: string | null
+          created_at: string | null
+          created_by: string | null
+          current_uses: number | null
+          description: string | null
+          discount_amount: number | null
+          discount_percentage: number | null
+          discount_type: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_order_amount: number | null
+          provider_id: string | null
+          start_date: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          discount_type?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+          provider_id?: string | null
+          start_date?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          discount_type?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+          provider_id?: string | null
+          start_date?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_articles: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string | null
+          delivery_time: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          price_max: number | null
+          price_min: number | null
+          price_unit: string | null
+          provider_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          delivery_time?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          price_unit?: string | null
+          provider_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          delivery_time?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          price_unit?: string | null
+          provider_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_articles_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_pages: {
+        Row: {
+          address: string | null
+          banner_url: string | null
+          business_hours: Json | null
+          company_name: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          logo_url: string | null
+          phone: string | null
+          provider_id: string
+          social_links: Json | null
+          specialties: string[] | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          banner_url?: string | null
+          business_hours?: Json | null
+          company_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          provider_id: string
+          social_links?: Json | null
+          specialties?: string[] | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          banner_url?: string | null
+          business_hours?: Json | null
+          company_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          provider_id?: string
+          social_links?: Json | null
+          specialties?: string[] | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_pages_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           id: string

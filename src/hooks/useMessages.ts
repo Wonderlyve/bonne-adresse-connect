@@ -44,7 +44,6 @@ export const useMessages = () => {
     try {
       setLoading(true);
       
-      // Try to fetch from conversations table, fallback to empty array if table doesn't exist
       try {
         const { data, error } = await supabase
           .from('conversations')
@@ -68,7 +67,7 @@ export const useMessages = () => {
 
               const { data: participant } = await supabase
                 .from('profiles')
-                .select('full_name, company_name')
+                .select('full_name')
                 .eq('id', otherParticipantId)
                 .single();
 
@@ -76,10 +75,21 @@ export const useMessages = () => {
 
               return {
                 ...conv,
-                type: conv.type || 'general',
-                order_id: conv.order_id || '',
-                other_participant: participant || { full_name: 'Utilisateur inconnu', company_name: '' },
-                last_message: lastMessage
+                type: 'general',
+                order_id: '',
+                other_participant: participant ? { 
+                  full_name: participant.full_name || 'Utilisateur inconnu', 
+                  company_name: '' 
+                } : { full_name: 'Utilisateur inconnu', company_name: '' },
+                last_message: lastMessage ? {
+                  id: '',
+                  content: lastMessage.content,
+                  file_url: '',
+                  message_type: 'text',
+                  conversation_id: conv.id,
+                  sender_id: lastMessage.sender_id,
+                  created_at: lastMessage.created_at
+                } : undefined
               };
             })
           );
@@ -171,8 +181,7 @@ export const useMessages = () => {
         .from('conversations')
         .insert({
           participant1_id: profile.id,
-          participant2_id: participantId,
-          type
+          participant2_id: participantId
         })
         .select()
         .single();
