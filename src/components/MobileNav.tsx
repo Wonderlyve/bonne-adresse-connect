@@ -1,28 +1,21 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, MessageCircle, User, ShoppingBag, Percent } from "lucide-react";
-import { useProfile } from "@/hooks/useProfile";
+import { Home, Search, MessageCircle, ShoppingBag, Percent } from "lucide-react";
 
 const MobileNav = () => {
   const location = useLocation();
-  const { profile } = useProfile();
 
   const navItems = [
     { path: "/", icon: Home, label: "Accueil" },
     { path: "/services", icon: Search, label: "Services" },
     { path: "/promotions", icon: Percent, label: "Promos" },
     { path: "/messages", icon: MessageCircle, label: "Messages" },
-    { path: "/orders", icon: ShoppingBag, label: "Commandes" },
-    { 
-      path: profile?.user_type === 'provider' ? "/provider-dashboard" : "/profile", 
-      icon: User, 
-      label: "Profil" 
-    }
+    { path: "/orders", icon: ShoppingBag, label: "Commandes" }
   ];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="grid grid-cols-6 h-16">
+      <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
