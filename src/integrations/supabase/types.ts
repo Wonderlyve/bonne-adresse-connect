@@ -115,12 +115,53 @@ export type Database = {
           },
         ]
       }
+      message_flags: {
+        Row: {
+          created_at: string
+          flagger_id: string
+          id: string
+          message_id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          flagger_id: string
+          id?: string
+          message_id: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          flagger_id?: string
+          id?: string
+          message_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_flags_flagger_id_fkey"
+            columns: ["flagger_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_flags_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
           conversation_id: string
           created_at: string
+          file_url: string | null
           id: string
+          message_type: string | null
           receiver_id: string
           sender_id: string
           status: Database["public"]["Enums"]["message_status"]
@@ -129,7 +170,9 @@ export type Database = {
           content: string
           conversation_id: string
           created_at?: string
+          file_url?: string | null
           id?: string
+          message_type?: string | null
           receiver_id: string
           sender_id: string
           status?: Database["public"]["Enums"]["message_status"]
@@ -138,7 +181,9 @@ export type Database = {
           content?: string
           conversation_id?: string
           created_at?: string
+          file_url?: string | null
           id?: string
+          message_type?: string | null
           receiver_id?: string
           sender_id?: string
           status?: Database["public"]["Enums"]["message_status"]
@@ -210,37 +255,52 @@ export type Database = {
       }
       orders: {
         Row: {
+          amount: number | null
           budget: number | null
           client_id: string
           created_at: string
+          deadline: string | null
+          delivery_date: string | null
           description: string | null
           id: string
+          payment_method: string | null
           provider_id: string
           service_id: string | null
+          service_name: string | null
           status: Database["public"]["Enums"]["order_status"]
           title: string
           updated_at: string
         }
         Insert: {
+          amount?: number | null
           budget?: number | null
           client_id: string
           created_at?: string
+          deadline?: string | null
+          delivery_date?: string | null
           description?: string | null
           id?: string
+          payment_method?: string | null
           provider_id: string
           service_id?: string | null
+          service_name?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           title: string
           updated_at?: string
         }
         Update: {
+          amount?: number | null
           budget?: number | null
           client_id?: string
           created_at?: string
+          deadline?: string | null
+          delivery_date?: string | null
           description?: string | null
           id?: string
+          payment_method?: string | null
           provider_id?: string
           service_id?: string | null
+          service_name?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           title?: string
           updated_at?: string
@@ -271,33 +331,72 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          badges: string[] | null
+          bio: string | null
+          company_name: string | null
+          completion_rate: number | null
           created_at: string
           email: string
           full_name: string | null
           id: string
+          is_online: boolean | null
+          location: string | null
           phone: string | null
+          price_range: string | null
+          rating: number | null
+          response_time: string | null
+          reviews_count: number | null
+          services_offered: string[] | null
+          specialties: string[] | null
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
           violation_count: number
         }
         Insert: {
+          avatar_url?: string | null
+          badges?: string[] | null
+          bio?: string | null
+          company_name?: string | null
+          completion_rate?: number | null
           created_at?: string
           email: string
           full_name?: string | null
           id: string
+          is_online?: boolean | null
+          location?: string | null
           phone?: string | null
+          price_range?: string | null
+          rating?: number | null
+          response_time?: string | null
+          reviews_count?: number | null
+          services_offered?: string[] | null
+          specialties?: string[] | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
           violation_count?: number
         }
         Update: {
+          avatar_url?: string | null
+          badges?: string[] | null
+          bio?: string | null
+          company_name?: string | null
+          completion_rate?: number | null
           created_at?: string
           email?: string
           full_name?: string | null
           id?: string
+          is_online?: boolean | null
+          location?: string | null
           phone?: string | null
+          price_range?: string | null
+          rating?: number | null
+          response_time?: string | null
+          reviews_count?: number | null
+          services_offered?: string[] | null
+          specialties?: string[] | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
@@ -501,6 +600,73 @@ export type Database = {
           },
         ]
       }
+      quote_requests: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          client_id: string
+          created_at: string
+          deadline: string | null
+          description: string
+          id: string
+          provider_id: string
+          service_id: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          client_id: string
+          created_at?: string
+          deadline?: string | null
+          description: string
+          id?: string
+          provider_id: string
+          service_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          client_id?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          id?: string
+          provider_id?: string
+          service_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_requests_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           amount: number
@@ -546,6 +712,54 @@ export type Database = {
           {
             foreignKeyName: "quotes_provider_id_fkey"
             columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_user_id?: string
+          reporter_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
