@@ -7,7 +7,6 @@ import { Search, Zap } from "lucide-react";
 const SearchSection = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,9 +14,6 @@ const SearchSection = () => {
     
     if (searchQuery.trim()) {
       params.append('search', searchQuery.trim());
-    }
-    if (location.trim()) {
-      params.append('location', location.trim());
     }
     
     navigate(`/providers?${params.toString()}`);
@@ -43,15 +39,6 @@ const SearchSection = () => {
                 className="w-full pl-10 pr-3 py-3 rounded-lg border-0 focus:ring-2 focus:ring-primary-500 focus:outline-none text-gray-700 placeholder-gray-400 text-sm"
               />
             </div>
-          </div>
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Où ? (Ville, code postal...)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-3 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:outline-none text-gray-700 placeholder-gray-400 text-sm"
-            />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
             <Button 
