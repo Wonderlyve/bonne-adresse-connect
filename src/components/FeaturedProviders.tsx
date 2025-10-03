@@ -86,7 +86,7 @@ const FeaturedProviders = () => {
         >
           <CarouselContent className="-ml-2 md:-ml-4">
             {featuredProviders.map((provider) => (
-              <CarouselItem key={provider.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={provider.id} className="pl-2 md:pl-4 basis-11/12 sm:basis-5/12 lg:basis-1/4">
                 <div 
                   className="group hover:shadow-lg transition-shadow cursor-pointer rounded-lg overflow-hidden bg-white border h-full"
                   onClick={() => handleProviderClick(provider.id)}
