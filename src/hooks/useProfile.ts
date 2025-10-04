@@ -11,6 +11,7 @@ export interface Profile {
   user_type: 'client' | 'provider';
   status: 'active' | 'suspended';
   violation_count: number;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -68,6 +69,7 @@ export const useProfile = () => {
         user_type: data.user_type as 'client' | 'provider',
         status: data.status as 'active' | 'suspended',
         violation_count: data.violation_count,
+        avatar_url: data.avatar_url,
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -86,11 +88,48 @@ export const useProfile = () => {
     setProfile(null);
   };
 
+  const updateProfile = async (updates: Partial<Profile>) => {
+    try {
+      if (!user?.id) return { error: 'No user logged in' };
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const profileData: Profile = {
+          id: data.id,
+          email: data.email,
+          full_name: data.full_name,
+          phone: data.phone,
+          user_type: data.user_type as 'client' | 'provider',
+          status: data.status as 'active' | 'suspended',
+          violation_count: data.violation_count,
+          avatar_url: data.avatar_url,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        };
+        setProfile(profileData);
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { data: null, error };
+    }
+  };
+
   return {
     profile,
     user,
     loading,
     signOut,
+    updateProfile,
     isAuthenticated: !!user,
     isSuspended: profile?.status === 'suspended'
   };

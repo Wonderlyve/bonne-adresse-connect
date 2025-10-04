@@ -13,11 +13,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, X, User, Settings, LogOut, MessageCircle, Package, Search } from "lucide-react";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthContext();
+  const { profile } = useProfile();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -86,7 +88,7 @@ const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="/placeholder.svg" alt={user?.name || ""} />
+                        <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} alt={user?.name || ""} />
                         <AvatarFallback>
                           {user?.name?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
@@ -138,8 +140,25 @@ const Navbar = () => {
           </div>
 
           {/* Menu mobile */}
-          <div className="md:hidden flex items-center">
-            {isAuthenticated && <NotificationBell />}
+          <div className="md:hidden flex items-center space-x-2">
+            {isAuthenticated && (
+              <>
+                <NotificationBell />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/profile")}
+                  className="p-0 h-8 w-8 rounded-full"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} alt={user?.name || ""} />
+                    <AvatarFallback>
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </>
+            )}
             <Button
               variant="ghost"
               size="sm"
