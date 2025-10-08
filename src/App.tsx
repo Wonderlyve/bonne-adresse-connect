@@ -96,7 +96,7 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/messages/:conversationId" element={
+                <Route path="/chat/:id" element={
                   <ProtectedRoute>
                     <ChatDetail />
                   </ProtectedRoute>

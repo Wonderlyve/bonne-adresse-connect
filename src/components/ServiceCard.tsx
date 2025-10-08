@@ -51,11 +51,9 @@ const ServiceCard = ({ service, onContact, onOrder }: ServiceCardProps) => {
         
         {service.provider && (
           <div className="flex items-center space-x-2 mb-3">
-            <img
-              src={service.provider.avatar_url || '/placeholder.svg'}
-              alt={service.provider.full_name}
-              className="w-8 h-8 rounded-full"
-            />
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+              {service.provider.full_name?.charAt(0)?.toUpperCase() || service.provider.email.charAt(0).toUpperCase()}
+            </div>
             <div>
               <p className="text-sm font-medium">{service.provider.full_name}</p>
               <p className="text-xs text-gray-500">{service.provider.email}</p>
@@ -68,13 +66,6 @@ const ServiceCard = ({ service, onContact, onOrder }: ServiceCardProps) => {
             <Clock className="h-4 w-4 mr-1" />
             <span>Livraison: {service.delivery_time || '3-5 jours'}</span>
           </div>
-          
-          {service.provider?.location && (
-            <div className="flex items-center text-sm text-gray-600">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span>{service.provider.location}</span>
-            </div>
-          )}
         </div>
         
         <div className="mt-4 flex items-center justify-between">

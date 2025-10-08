@@ -3,6 +3,7 @@ import { usePageReset } from "@/hooks/usePageReset";
 import { useMessages } from "@/hooks/useMessages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Plus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -61,11 +62,9 @@ const Messages = () => {
             >
               <CardContent className="p-4">
                 <div className="flex items-center space-x-4">
-                  <img
-                    src={conversation.other_participant?.profile_image || "/placeholder.svg"}
-                    alt={conversation.other_participant?.full_name || "User"}
-                    className="w-12 h-12 rounded-full"
-                  />
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {conversation.other_participant?.full_name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
                   
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">

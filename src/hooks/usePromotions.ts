@@ -63,8 +63,9 @@ export const usePromotions = () => {
       const { data, error } = await supabase
         .from('promotions')
         .insert({
+          title: promotionData.title || 'Nouvelle promotion',
+          description: promotionData.description || '',
           ...promotionData,
-          provider_id: profile.id,
           created_by: profile.id
         })
         .select()

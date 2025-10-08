@@ -89,8 +89,10 @@ export const useOrders = () => {
       const { data, error } = await supabase
         .from('orders')
         .insert({
+          title: orderData.service_name || 'Nouvelle commande',
           ...orderData,
-          client_id: profile.id
+          client_id: profile.id,
+          status: 'pending' as const
         })
         .select()
         .single();
@@ -106,7 +108,7 @@ export const useOrders = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
+  const updateOrderStatus = async (orderId: string, status: 'pending' | 'in_progress' | 'completed' | 'cancelled') => {
     try {
       const { error } = await supabase
         .from('orders')

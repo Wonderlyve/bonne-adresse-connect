@@ -75,7 +75,7 @@ const ChatDetail = () => {
     const { data, error } = await supabase
       .from('orders')
       .select('*')
-      .eq('status', 'paid')
+      .eq('status', 'completed')
       .or(`client_id.eq.${user.id},provider_id.eq.${user.id}`)
       .limit(1);
 

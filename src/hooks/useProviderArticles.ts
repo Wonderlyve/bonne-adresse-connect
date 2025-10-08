@@ -60,8 +60,8 @@ export const useProviderArticles = () => {
       const { data, error } = await supabase
         .from('provider_articles')
         .insert({
-          ...articleData,
-          provider_id: profile.id
+          title: articleData.title || 'Nouvel article',
+          ...articleData
         })
         .select()
         .single();

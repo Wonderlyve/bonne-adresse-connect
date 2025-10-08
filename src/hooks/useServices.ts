@@ -84,8 +84,10 @@ export const useServices = () => {
       const { data, error } = await supabase
         .from('services')
         .insert({
-          ...serviceData,
-          provider_id: profile.id
+          title: serviceData.title || 'Nouveau service',
+          description: serviceData.description || '',
+          price: serviceData.price_min || 0,
+          ...serviceData
         })
         .select()
         .single();

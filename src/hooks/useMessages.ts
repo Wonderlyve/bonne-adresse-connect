@@ -139,8 +139,10 @@ export const useMessages = () => {
         .insert({
           conversation_id: conversationId,
           sender_id: profile.id,
+          receiver_id: '', // Will be filled by the DB
           content,
-          message_type: messageType
+          message_type: messageType,
+          status: 'unread' as const
         })
         .select()
         .single();

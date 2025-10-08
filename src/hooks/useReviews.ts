@@ -28,14 +28,11 @@ export const useReviews = () => {
       setLoading(true);
       let query = supabase
         .from('reviews')
-        .select(`
-          *,
-          reviewer:profiles!reviewer_id(full_name, profile_image)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (providerId) {
-        query = query.eq('reviewed_id', providerId);
+        query = query.eq('provider_id', providerId);
       }
 
       const { data, error } = await query;
@@ -60,8 +57,12 @@ export const useReviews = () => {
       const { data, error } = await supabase
         .from('reviews')
         .insert({
-          ...reviewData,
-          reviewer_id: user.id
+          client_id: user.id,
+          provider_id: reviewData.reviewed_id || '',
+          rating: reviewData.rating || 5,
+          comment: reviewData.comment || '',
+          order_id: reviewData.order_id || '',
+          ...reviewData
         })
         .select()
         .single();
@@ -77,7 +78,7 @@ export const useReviews = () => {
   };
 
   const getAverageRating = (providerId: string) => {
-    const providerReviews = reviews.filter(r => r.reviewed_id === providerId);
+    const providerReviews = reviews.filter(r => r.provider_id === providerId);
     if (providerReviews.length === 0) return 0;
     
     const totalRating = providerReviews.reduce((sum, review) => sum + review.rating, 0);

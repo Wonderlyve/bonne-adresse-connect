@@ -51,11 +51,7 @@ const Services = () => {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    if (category !== "all") {
-      fetchServices(category);
-    } else {
-      fetchServices();
-    }
+    fetchServices();
   };
 
   if (loading) {

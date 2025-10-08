@@ -1,17 +1,27 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, MessageCircle, ShoppingBag, Percent } from "lucide-react";
+import { Home, Search, MessageCircle, ShoppingBag, Percent, LayoutDashboard } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const MobileNav = () => {
   const location = useLocation();
+  const { user } = useAuthContext();
 
-  const navItems = [
-    { path: "/", icon: Home, label: "Accueil" },
-    { path: "/services", icon: Search, label: "Services" },
-    { path: "/promotions", icon: Percent, label: "Promos" },
-    { path: "/messages", icon: MessageCircle, label: "Messages" },
-    { path: "/orders", icon: ShoppingBag, label: "Commandes" }
-  ];
+  const navItems = user?.userType === 'provider' 
+    ? [
+        { path: "/", icon: Home, label: "Accueil" },
+        { path: "/services", icon: Search, label: "Services" },
+        { path: "/promotions", icon: Percent, label: "Promos" },
+        { path: "/messages", icon: MessageCircle, label: "Messages" },
+        { path: "/provider-dashboard", icon: LayoutDashboard, label: "Admin" }
+      ]
+    : [
+        { path: "/", icon: Home, label: "Accueil" },
+        { path: "/services", icon: Search, label: "Services" },
+        { path: "/promotions", icon: Percent, label: "Promos" },
+        { path: "/messages", icon: MessageCircle, label: "Messages" },
+        { path: "/orders", icon: ShoppingBag, label: "Commandes" }
+      ];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
