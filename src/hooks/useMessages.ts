@@ -122,7 +122,9 @@ export const useMessages = () => {
       if (error) throw error;
       setMessages(data?.map(msg => ({
         ...msg,
-        sender: msg.sender || { full_name: 'Utilisateur inconnu' }
+        sender: (msg.sender && typeof msg.sender === 'object' && !Array.isArray(msg.sender) && 'full_name' in msg.sender) 
+          ? msg.sender 
+          : { full_name: 'Utilisateur inconnu' }
       })) || []);
     } catch (error) {
       console.error('Erreur lors du chargement des messages:', error);

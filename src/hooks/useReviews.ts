@@ -38,7 +38,11 @@ export const useReviews = () => {
       const { data, error } = await query;
       
       if (error) throw error;
-      setReviews(data || []);
+      setReviews((data || []).map(review => ({
+        ...review,
+        reviewer_id: review.client_id,
+        reviewed_id: review.provider_id
+      })));
     } catch (error) {
       console.error('Erreur lors du chargement des avis:', error);
       toast.error('Erreur lors du chargement des avis');
@@ -78,7 +82,7 @@ export const useReviews = () => {
   };
 
   const getAverageRating = (providerId: string) => {
-    const providerReviews = reviews.filter(r => r.provider_id === providerId);
+    const providerReviews = reviews.filter(r => r.reviewed_id === providerId);
     if (providerReviews.length === 0) return 0;
     
     const totalRating = providerReviews.reduce((sum, review) => sum + review.rating, 0);

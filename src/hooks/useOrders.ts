@@ -88,12 +88,11 @@ export const useOrders = () => {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .insert({
-          title: orderData.service_name || 'Nouvelle commande',
+        .insert([{
           ...orderData,
-          client_id: profile.id,
-          status: 'pending' as const
-        })
+          provider_id: orderData.provider_id || '',
+          status: 'pending'
+        }] as any)
         .select()
         .single();
 

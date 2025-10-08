@@ -59,7 +59,18 @@ export const useServices = () => {
           console.log('Services table not ready, using mock data');
           setServices(getMockServices());
         } else {
-          setServices(data || []);
+          const mappedServices = (data || []).map((service: any) => ({
+            ...service,
+            category_id: service.category_id || '',
+            price_min: service.price_min || 0,
+            price_max: service.price_max || 0,
+            price_unit: service.price_unit || 'USD',
+            delivery_time: service.delivery_time || '3-5 jours',
+            category: (service.category && typeof service.category === 'object' && service.category !== null && 'name' in service.category)
+              ? service.category
+              : { name: 'Non catégorisé', slug: 'autres' }
+          }));
+          setServices(mappedServices);
         }
       } catch (error) {
         console.log('Services table not ready, using mock data');
@@ -86,8 +97,14 @@ export const useServices = () => {
         .insert({
           title: serviceData.title || 'Nouveau service',
           description: serviceData.description || '',
-          price: serviceData.price_min || 0,
-          ...serviceData
+          price_min: serviceData.price_min || 0,
+          price_max: serviceData.price_max || 0,
+          price_unit: serviceData.price_unit || 'USD',
+          delivery_time: serviceData.delivery_time || '3-5 jours',
+          category_id: serviceData.category_id || '',
+          provider_id: profile.id,
+          images: serviceData.images || [],
+          is_active: true
         })
         .select()
         .single();

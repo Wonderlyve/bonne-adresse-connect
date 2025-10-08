@@ -96,12 +96,13 @@ const ChatDetail = () => {
     }
 
     try {
-      const { error } = await supabase.from('messages').insert({
-        conversation_id: id,
+      const { error } = await supabase.from('messages').insert([{
         sender_id: user.id,
+        receiver_id: otherParticipant?.id || '',
         content: message.trim(),
-        message_type: 'text'
-      });
+        message_type: 'text',
+        status: 'unread'
+      }] as any);
 
       if (error) throw error;
 

@@ -60,8 +60,17 @@ export const useProviderArticles = () => {
       const { data, error } = await supabase
         .from('provider_articles')
         .insert({
+          provider_id: profile.id,
           title: articleData.title || 'Nouvel article',
-          ...articleData
+          description: articleData.description || '',
+          content: articleData.content,
+          images: articleData.images,
+          price_min: articleData.price_min,
+          price_max: articleData.price_max,
+          price_unit: articleData.price_unit,
+          category: articleData.category,
+          delivery_time: articleData.delivery_time,
+          is_active: articleData.is_active ?? true
         })
         .select()
         .single();

@@ -10,7 +10,7 @@ export const useConversations = () => {
   const { user } = useProfile();
   const [isCreating, setIsCreating] = useState(false);
 
-  const createOrFindConversation = async (providerId: number) => {
+  const createOrFindConversation = async (providerId: string) => {
     if (!user) {
       toast.error('Veuillez vous connecter pour envoyer un message');
       navigate('/login');
@@ -18,15 +18,12 @@ export const useConversations = () => {
     }
 
     setIsCreating(true);
-    try {
-      // Créer une conversation avec un ID unique pour le prestataire
-      const providerUserId = `provider_${providerId}`;
-      
+    try {      
       // Vérifier si une conversation existe déjà
       const { data: existingConv, error: searchError } = await supabase
         .from('conversations')
         .select('id')
-        .or(`and(participant1_id.eq.${user.id},participant2_id.eq.${providerUserId}),and(participant1_id.eq.${providerUserId},participant2_id.eq.${user.id})`)
+        .or(`and(participant1_id.eq.${user.id},participant2_id.eq.${providerId}),and(participant1_id.eq.${providerId},participant2_id.eq.${user.id})`)
         .maybeSingle();
 
       if (searchError && searchError.code !== 'PGRST116') {
@@ -41,10 +38,10 @@ export const useConversations = () => {
         // Créer une nouvelle conversation
         const { data: newConv, error: createError } = await supabase
           .from('conversations')
-          .insert({
+          .insert([{
             participant1_id: user.id,
-            participant2_id: providerUserId
-          })
+            participant2_id: providerId
+          }] as any)
           .select('id')
           .single();
 

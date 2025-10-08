@@ -93,9 +93,14 @@ export const useQuotes = () => {
       const { data, error } = await supabase
         .from('quote_requests')
         .insert({
+          client_id: profile.id,
+          provider_id: requestData.provider_id || '',
+          service_id: requestData.service_id || '',
           title: requestData.title || 'Nouvelle demande',
           description: requestData.description || '',
-          ...requestData
+          budget_min: requestData.budget_min,
+          budget_max: requestData.budget_max,
+          deadline: requestData.deadline
         })
         .select()
         .single();
@@ -120,12 +125,12 @@ export const useQuotes = () => {
     try {
       const { data, error } = await supabase
         .from('quotes')
-        .insert({
-          client_id: quoteData.quote_request_id || '',
-          service_title: 'Devis',
+        .insert([{
+          provider_id: profile.id,
           amount: quoteData.amount || 0,
-          ...quoteData
-        })
+          description: quoteData.description || '',
+          status: 'pending'
+        }] as any)
         .select()
         .single();
 
