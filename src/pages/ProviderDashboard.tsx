@@ -29,6 +29,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useProviderArticles } from "@/hooks/useProviderArticles";
 import { usePromotions } from "@/hooks/usePromotions";
 import { useProviderPage } from "@/hooks/useProviderPage";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
@@ -53,8 +55,11 @@ const ProviderDashboard = () => {
     price_min: 0,
     price_max: 0,
     category: "",
-    delivery_time: ""
+    delivery_time: "",
+    images: [] as string[]
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [newPromotion, setNewPromotion] = useState({
     title: "",
@@ -99,6 +104,47 @@ const ProviderDashboard = () => {
     await createOrUpdateProviderPage(pageData);
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile) return;
+
+    try {
+      setUploadingImage(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
+      const filePath = `${profile.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('article-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(filePath);
+
+      setNewArticle({
+        ...newArticle,
+        images: [...newArticle.images, publicUrl]
+      });
+
+      toast.success('Image ajoutée avec succès');
+    } catch (error) {
+      console.error('Erreur lors de l\'upload:', error);
+      toast.error('Erreur lors de l\'upload de l\'image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    setNewArticle({
+      ...newArticle,
+      images: newArticle.images.filter((_, index) => index !== indexToRemove)
+    });
+  };
+
   const handleCreateArticle = async () => {
     await createArticle(newArticle);
     setNewArticle({
@@ -108,7 +154,8 @@ const ProviderDashboard = () => {
       price_min: 0,
       price_max: 0,
       category: "",
-      delivery_time: ""
+      delivery_time: "",
+      images: []
     });
   };
 
@@ -288,6 +335,42 @@ const ProviderDashboard = () => {
                       value={newArticle.delivery_time}
                       onChange={(e) => setNewArticle({...newArticle, delivery_time: e.target.value})}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="article-image">Images de l'article</Label>
+                    <Input
+                      id="article-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                    />
+                    {uploadingImage && (
+                      <p className="text-sm text-muted-foreground">Upload en cours...</p>
+                    )}
+                    {newArticle.images.length > 0 && (
+                      <div className="grid grid-cols-4 gap-2 mt-2">
+                        {newArticle.images.map((img, index) => (
+                          <div key={index} className="relative">
+                            <img 
+                              src={img} 
+                              alt={`Preview ${index + 1}`} 
+                              className="w-full h-20 object-cover rounded"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-0 right-0 h-6 w-6 p-0"
+                              onClick={() => handleRemoveImage(index)}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <Button onClick={handleCreateArticle}>
