@@ -108,6 +108,19 @@ const ProviderDashboard = () => {
     const file = event.target.files?.[0];
     if (!file || !profile) return;
 
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Type de fichier non supporté. Utilisez JPG, PNG, WEBP ou GIF.');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('L\'image est trop grande. Maximum 5MB.');
+      return;
+    }
+
     try {
       setUploadingImage(true);
       const fileExt = file.name.split('.').pop();
@@ -120,19 +133,25 @@ const ProviderDashboard = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Use signed URL for secure access (works with non-public buckets)
+      const { data: signedUrlData, error: urlError } = await supabase.storage
         .from('article-images')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365 * 5); // 5 years validity
+
+      if (urlError) throw urlError;
 
       setNewArticle({
         ...newArticle,
-        images: [...newArticle.images, publicUrl]
+        images: [...newArticle.images, signedUrlData.signedUrl]
       });
 
       toast.success('Image ajoutée avec succès');
-    } catch (error) {
+      
+      // Reset file input
+      event.target.value = '';
+    } catch (error: any) {
       console.error('Erreur lors de l\'upload:', error);
-      toast.error('Erreur lors de l\'upload de l\'image');
+      toast.error(error.message || 'Erreur lors de l\'upload de l\'image');
     } finally {
       setUploadingImage(false);
     }
@@ -388,25 +407,64 @@ const ProviderDashboard = () => {
                   <div className="space-y-4">
                     {articles.map((article) => (
                       <div key={article.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold">{article.title}</h3>
-                            <p className="text-sm text-gray-600">{article.description}</p>
-                            <p className="text-sm text-gray-500">
-                              ${article.price_min} - ${article.price_max}
-                            </p>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => deleteArticle(article.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                        <div className="flex gap-4">
+                          {/* Article Images */}
+                          {article.images && article.images.length > 0 && (
+                            <div className="flex-shrink-0">
+                              <img 
+                                src={article.images[0]} 
+                                alt={article.title}
+                                className="w-32 h-32 object-cover rounded-lg"
+                                onError={(e) => {
+                                  e.currentTarget.src = 'https://via.placeholder.com/128?text=Image';
+                                }}
+                              />
+                              {article.images.length > 1 && (
+                                <p className="text-xs text-gray-500 mt-1 text-center">
+                                  +{article.images.length - 1} autre(s)
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Article Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-lg">{article.title}</h3>
+                                <Badge variant="secondary" className="mt-1">
+                                  {article.category}
+                                </Badge>
+                                <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                                  {article.description}
+                                </p>
+                                <div className="flex items-center gap-4 mt-3">
+                                  <p className="text-sm font-semibold text-primary">
+                                    ${article.price_min} - ${article.price_max}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    Délai: {article.delivery_time}
+                                  </p>
+                                  <Badge variant={article.is_active ? "default" : "secondary"}>
+                                    {article.is_active ? "Actif" : "Inactif"}
+                                  </Badge>
+                                </div>
+                              </div>
+                              
+                              {/* Actions */}
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => deleteArticle(article.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
