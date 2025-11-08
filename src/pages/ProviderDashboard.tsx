@@ -133,16 +133,14 @@ const ProviderDashboard = () => {
 
       if (uploadError) throw uploadError;
 
-      // Use signed URL for secure access (works with non-public buckets)
-      const { data: signedUrlData, error: urlError } = await supabase.storage
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
         .from('article-images')
-        .createSignedUrl(filePath, 60 * 60 * 24 * 365 * 5); // 5 years validity
-
-      if (urlError) throw urlError;
+        .getPublicUrl(filePath);
 
       setNewArticle({
         ...newArticle,
-        images: [...newArticle.images, signedUrlData.signedUrl]
+        images: [...newArticle.images, publicUrl]
       });
 
       toast.success('Image ajoutée avec succès');
