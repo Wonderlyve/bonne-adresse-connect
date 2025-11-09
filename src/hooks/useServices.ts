@@ -38,48 +38,51 @@ export const useServices = () => {
     try {
       setLoading(true);
       
-      // Try to fetch from services table, fallback to mock data if table doesn't exist
-      try {
-        let query = supabase
-          .from('services')
-          .select(`
-            *,
-            provider:profiles(full_name, email, company_name),
-            category:service_categories(name, slug)
-          `)
-          .eq('is_active', true);
+      // Fetch from provider_articles table
+      let query = supabase
+        .from('provider_articles')
+        .select(`
+          *,
+          provider:profiles!provider_articles_provider_id_fkey(
+            full_name,
+            email,
+            company_name
+          )
+        `)
+        .eq('is_active', true);
 
-        if (categorySlug) {
-          query = query.eq('service_categories.slug', categorySlug);
-        }
+      if (categorySlug && categorySlug !== 'all') {
+        query = query.eq('category', categorySlug);
+      }
 
-        const { data, error } = await query.order('created_at', { ascending: false });
-        
-        if (error) {
-          console.log('Services table not ready, using mock data');
-          setServices(getMockServices());
-        } else {
-          const mappedServices = (data || []).map((service: any) => ({
-            ...service,
-            category_id: service.category_id || '',
-            price_min: service.price_min || 0,
-            price_max: service.price_max || 0,
-            price_unit: service.price_unit || 'USD',
-            delivery_time: service.delivery_time || '3-5 jours',
-            category: (service.category && typeof service.category === 'object' && service.category !== null && 'name' in service.category)
-              ? service.category
-              : { name: 'Non catégorisé', slug: 'autres' }
-          }));
-          setServices(mappedServices);
-        }
-      } catch (error) {
-        console.log('Services table not ready, using mock data');
-        setServices(getMockServices());
+      const { data, error } = await query.order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching services:', error);
+        toast.error('Erreur lors du chargement des services');
+        setServices([]);
+      } else {
+        // Transform image paths to public URLs
+        const servicesWithUrls = (data || []).map((article: any) => ({
+          ...article,
+          category_id: article.category || '',
+          images: (article.images || []).map((imagePath: string) => {
+            const { data: urlData } = supabase.storage
+              .from('article-images')
+              .getPublicUrl(imagePath);
+            return urlData.publicUrl;
+          }),
+          category: {
+            name: article.category || 'Autre',
+            slug: article.category || 'autre'
+          }
+        }));
+        setServices(servicesWithUrls);
       }
     } catch (error) {
       console.error('Erreur lors du chargement des services:', error);
       toast.error('Erreur lors du chargement des services');
-      setServices(getMockServices());
+      setServices([]);
     } finally {
       setLoading(false);
     }
@@ -93,15 +96,16 @@ export const useServices = () => {
 
     try {
       const { data, error } = await supabase
-        .from('services')
+        .from('provider_articles')
         .insert({
           title: serviceData.title || 'Nouveau service',
           description: serviceData.description || '',
+          content: serviceData.description || '',
           price_min: serviceData.price_min || 0,
           price_max: serviceData.price_max || 0,
-          price_unit: serviceData.price_unit || 'USD',
+          price_unit: serviceData.price_unit || '€',
           delivery_time: serviceData.delivery_time || '3-5 jours',
-          category_id: serviceData.category_id || '',
+          category: serviceData.category_id || 'autre',
           provider_id: profile.id,
           images: serviceData.images || [],
           is_active: true

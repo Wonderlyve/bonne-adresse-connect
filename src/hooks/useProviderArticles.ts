@@ -44,7 +44,19 @@ export const useProviderArticles = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setArticles(data || []);
+      
+      // Transform image paths to public URLs
+      const articlesWithUrls = (data || []).map(article => ({
+        ...article,
+        images: (article.images || []).map((imagePath: string) => {
+          const { data: urlData } = supabase.storage
+            .from('article-images')
+            .getPublicUrl(imagePath);
+          return urlData.publicUrl;
+        })
+      }));
+      
+      setArticles(articlesWithUrls);
     } catch (error) {
       console.error('Erreur lors du chargement des articles:', error);
       setArticles([]);

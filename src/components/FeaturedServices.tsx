@@ -57,7 +57,18 @@ const FeaturedServices = () => {
 
       if (error) throw error;
 
-      setServices(articles || []);
+      // Transform image paths to public URLs
+      const servicesWithUrls = (articles || []).map(article => ({
+        ...article,
+        images: (article.images || []).map((imagePath: string) => {
+          const { data } = supabase.storage
+            .from('article-images')
+            .getPublicUrl(imagePath);
+          return data.publicUrl;
+        })
+      }));
+
+      setServices(servicesWithUrls);
     } catch (error) {
       console.error('Error fetching services:', error);
     } finally {
