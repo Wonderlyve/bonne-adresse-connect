@@ -23,7 +23,8 @@ import {
   Plus,
   Trash2,
   Eye,
-  Percent
+  Percent,
+  X
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useProviderArticles } from "@/hooks/useProviderArticles";
@@ -133,14 +134,10 @@ const ProviderDashboard = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('article-images')
-        .getPublicUrl(filePath);
-
+      // Store the file path (not the full URL) so we can generate public URLs later
       setNewArticle({
         ...newArticle,
-        images: [...newArticle.images, publicUrl]
+        images: [...newArticle.images, filePath]
       });
 
       toast.success('Image ajoutée avec succès');
@@ -368,24 +365,29 @@ const ProviderDashboard = () => {
                     )}
                     {newArticle.images.length > 0 && (
                       <div className="grid grid-cols-4 gap-2 mt-2">
-                        {newArticle.images.map((img, index) => (
-                          <div key={index} className="relative">
-                            <img 
-                              src={img} 
-                              alt={`Preview ${index + 1}`} 
-                              className="w-full h-20 object-cover rounded"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-0 right-0 h-6 w-6 p-0"
-                              onClick={() => handleRemoveImage(index)}
-                            >
-                              ×
-                            </Button>
-                          </div>
-                        ))}
+                        {newArticle.images.map((imagePath, index) => {
+                          const { data } = supabase.storage
+                            .from('article-images')
+                            .getPublicUrl(imagePath);
+                          return (
+                            <div key={index} className="relative">
+                              <img 
+                                src={data.publicUrl} 
+                                alt={`Preview ${index + 1}`} 
+                                className="w-full h-20 object-cover rounded"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-0 right-0 h-6 w-6 p-0"
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
